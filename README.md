@@ -1,6 +1,6 @@
-3110 Final Project: Team Name TBD
+# 3110 Final Project: Team Name TBD
 
-Contributors:
+## Contributors:
 Iram Liu il233
 Kelly Yu ky322
 Joanna Lin jl2748
