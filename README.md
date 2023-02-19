@@ -1,4 +1,4 @@
-# 3110 Final Project: Team Name TBD
+# 3110 Final Project: Big Bactrian Camels
 
 ## Contributors:
 Iram Liu il233\
