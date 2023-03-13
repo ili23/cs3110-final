@@ -1,5 +1,6 @@
-3110 Final Project: Team Name TBD
+# 3110 Final Project: Big Bactrian Camels
 
-Contributors:
-Iram Liu il233
-Kelly Yu ky322
+## Contributors:
+Iram Liu il233\
+Joanna Lin jl2748\
+Jeffrey Xiang jjx5
