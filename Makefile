@@ -24,15 +24,14 @@ play:
 # finalcheck:
 # 	@bash check.sh final
 
-# need to add zip files
-# zip:
-# 	rm -f adventure.zip
-# 	zip -r adventure.zip . -x@exclude.lst
 
-# need to add clean (not really sure what it does right now)
-# clean:
-# 	dune clean
-# 	rm -f adventure.zip
+zip:
+	rm -f adventure.zip
+	zip -r adventure.zip . -x@exclude.lst
+
+clean:
+	dune clean
+	rm -f adventure.zip
 
 # potentially need to add this stuff although if we dont make any compilation units, we prolly don't need this 
 # doc:
