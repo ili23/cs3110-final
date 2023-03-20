@@ -4,7 +4,7 @@
 # Workspace root: "/Users/iramliu/Documents/Sophomore Year/CS 3110 - Functional
 # Programming/Final Project"
 # Auto-detected concurrency: 8
-$ /Users/iramliu/.opam/cs3110-2023sp/bin/ocamlc.opt -config > /var/folders/4j/c26320x118b30p_z9wtdxtg40000gn/T/dune_ed1a90_output
+$ /Users/iramliu/.opam/cs3110-2023sp/bin/ocamlc.opt -config > /var/folders/4j/c26320x118b30p_z9wtdxtg40000gn/T/dune_02739d_output
 # Dune context:
 #  { name = "default"
 #  ; kind = "default"
@@ -116,9 +116,3 @@ $ /Users/iramliu/.opam/cs3110-2023sp/bin/ocamlc.opt -config > /var/folders/4j/c2
 #      ; windows_unicode = false
 #      }
 #  }
-$ (cd _build/default && /Users/iramliu/.opam/cs3110-2023sp/bin/ocamlopt.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -g -I test/.main.eobjs/byte -I test/.main.eobjs/native -I /Users/iramliu/.opam/cs3110-2023sp/lib/ounit2 -I /Users/iramliu/.opam/cs3110-2023sp/lib/ounit2/advanced -I /Users/iramliu/.opam/cs3110-2023sp/lib/seq -I /Users/iramliu/.opam/cs3110-2023sp/lib/stdlib-shims -intf-suffix .ml -no-alias-deps -opaque -o test/.main.eobjs/native/dune__exe__Main.cmx -c -impl test/main.ml)
-> File "test/main.ml", line 1, characters 0-11:
-> 1 | open OUnit2
->     ^^^^^^^^^^^
-> Error (warning 33 [unused-open]): unused open OUnit2.
-[2]
