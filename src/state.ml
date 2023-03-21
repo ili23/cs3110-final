@@ -16,7 +16,7 @@ type state = {
 }
 
 let init_player name =
-  { name; ready = false; id = 0; hand = []; score = 0; won_cards = [] }
+  { name; ready = false; id = -1; hand = []; score = 0; won_cards = [] }
 
 let init_state cards = { deck = cards; players = []; current_player = 0 }
 
@@ -35,3 +35,8 @@ let assign_id game_state num =
   for now*)
 let next_turn game_state =
   { game_state with current_player = (game_state.current_player + 1) mod 4 }
+
+let rec checkHand hand (card : int) =
+  match hand with
+  | [] -> false
+  | h :: t -> if h == card then true else checkHand t card

@@ -1,0 +1,2 @@
+type player
+type state
