@@ -78,9 +78,61 @@ let initialize_deck : int list =
     13;
   ]
 
-(* let shuffle_deck a = let n = Array.length a in let a = Array.copy a in for i
-   = n - 1 downto 1 do let k = Random.int (i + 1) in let x = a.(k) in a.(k) <-
-   a.(i); a.(i) <- x done; a *)
+let fake_list =
+  [
+    3;
+    1;
+    10;
+    7;
+    3;
+    2;
+    6;
+    2;
+    12;
+    1;
+    3;
+    2;
+    11;
+    11;
+    4;
+    4;
+    13;
+    5;
+    5;
+    9;
+    6;
+    6;
+    2;
+    6;
+    7;
+    1;
+    9;
+    7;
+    8;
+    8;
+    10;
+    8;
+    9;
+    5;
+    9;
+    7;
+    10;
+    8;
+    10;
+    1;
+    4;
+    11;
+    4;
+    13;
+    12;
+    3;
+    12;
+    12;
+    13;
+    5;
+    11;
+    13;
+  ]
 
 let shuffle d =
   let nd = List.map (fun c -> (Random.bits (), c)) d in

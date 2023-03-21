@@ -1,0 +1,2 @@
+exception Unrecognized
+exception Empty
