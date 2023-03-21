@@ -1,19 +1,4 @@
-type player = {
-  name : string;
-  ready : bool;
-  id : int;
-  hand : int list;
-  score : int;
-  won_cards : int list;
-}
-
-type state = {
-  deck : int list;
-  players : player list;
-  current_player : int;
-      (*Could potentially swap this to player but this might be a little easier
-        to change*)
-}
+open Game
 
 let play_helper players =
   match players with
@@ -32,8 +17,8 @@ let initialize_name i player =
   let words = String.split_on_char ' ' (read_line ()) in
   let full_words = List.filter remove_empty words in
   match full_words with
-  | [] -> { player with name = "Unknown Player" ^ string_of_int i }
-  | h :: t -> { player with name = h ^ to_string t }
+  | [] -> { player with State.name = "Unknown Player" ^ string_of_int i }
+  | h :: t -> { player with State.name = h ^ to_string t }
 
 let play_game number_player =
   match number_player with
