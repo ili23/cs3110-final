@@ -1,3 +1,5 @@
+open Game
+
 let play_helper players =
   match players with
   | i -> print_endline "Make turn"
