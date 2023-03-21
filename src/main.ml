@@ -134,10 +134,6 @@ let fake_list =
     13;
   ]
 
-(* let shuffle_deck a = let n = Array.length a in let a = Array.copy a in for i
-   = n - 1 downto 1 do let k = Random.int (i + 1) in let x = a.(k) in a.(k) <-
-   a.(i); a.(i) <- x done; a *)
-
 let shuffle d =
   let nd = List.map (fun c -> (Random.bits (), c)) d in
   let sond = List.sort compare nd in
