@@ -1,5 +1,4 @@
 open Printf
-open Game
 
 type player = {
   name : string;
@@ -10,7 +9,16 @@ type player = {
   won_cards : int list;
 }
 
+type state = {
+  deck : int list;
+  players : player list;
+  current_player : int;
+      (*Could potentially swap this to player but this might be a little easier
+        to change*)
+}
+
 exception Temporary
+
 (* let initialize_deck = let deck : int list = [] in for i = 1 to 13 do for j =
    1 to 4 do deck @ [ i ]; print_int (List.length deck) done done *)
 
@@ -126,28 +134,32 @@ let fake_list =
     13;
   ]
 
-let shuffle_deck a =
-  let n = Array.length a in
-  let a = Array.copy a in
-  for i = n - 1 downto 1 do
-    let k = Random.int (i + 1) in
-    let x = a.(k) in
-    a.(k) <- a.(i);
-    a.(i) <- x
-  done;
-  a
+let shuffle d =
+  let nd = List.map (fun c -> (Random.bits (), c)) d in
+  let sond = List.sort compare nd in
+  List.map snd sond
 
-let rec initialize_players_hands players deck =
+let rec initialize_players_hands state players deck =
   match players with
   | [ h ] -> (
       match deck with
       | h1 :: h2 :: h3 :: h4 :: h5 :: q ->
-          [ { h with hand = h1 :: h2 :: h3 :: h4 :: h5 :: h.hand } ]
+          {
+            state with
+            players = [ { h with hand = h1 :: h2 :: h3 :: h4 :: h5 :: h.hand } ];
+            deck = q;
+          }
       | _ -> raise Temporary)
   | h :: t -> (
       match deck with
       | h1 :: h2 :: h3 :: h4 :: h5 :: q ->
-          { h with hand = h1 :: h2 :: h3 :: h4 :: h5 :: h.hand }
-          :: initialize_players_hands t q
+          initialize_players_hands
+            {
+              state with
+              players =
+                [ { h with hand = h1 :: h2 :: h3 :: h4 :: h5 :: h.hand } ];
+              deck = q;
+            }
+            t q
       | _ -> raise Temporary)
   | [] -> raise Temporary
