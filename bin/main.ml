@@ -1,8 +1,39 @@
-open Game
+type player = {
+  name : string;
+  ready : bool;
+  id : int;
+  hand : int list;
+  score : int;
+  won_cards : int list;
+}
+
+type state = {
+  deck : int list;
+  players : player list;
+  current_player : int;
+      (*Could potentially swap this to player but this might be a little easier
+        to change*)
+}
 
 let play_helper players =
   match players with
   | i -> print_endline "Make turn"
+
+let remove_empty x = String.length x > 0
+
+let rec to_string lst =
+  match lst with
+  | [] -> ""
+  | h :: t -> h ^ to_string t
+
+let initialize_name i player =
+  print_endline ("Please enter the name of player" ^ string_of_int i);
+  print_string "> ";
+  let words = String.split_on_char ' ' (read_line ()) in
+  let full_words = List.filter remove_empty words in
+  match full_words with
+  | [] -> { player with name = "Unknown Player" ^ string_of_int i }
+  | h :: t -> { player with name = h ^ to_string t }
 
 let play_game number_player =
   match number_player with
