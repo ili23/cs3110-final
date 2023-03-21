@@ -133,6 +133,20 @@ let fake_list =
     11;
     13;
   ]
+<<<<<<< HEAD
+=======
+
+let shuffle_deck a =
+  let n = Array.length a in
+  let a = Array.copy a in
+  for i = n - 1 downto 1 do
+    let k = Random.int (i + 1) in
+    let x = a.(k) in
+    a.(k) <- a.(i);
+    a.(i) <- x
+  done;
+  a
+>>>>>>> d1e6620bc65fd2ca0dd6cfceecc32548498e0e39
 
 (* let shuffle_deck a = let n = Array.length a in let a = Array.copy a in for i
    = n - 1 downto 1 do let k = Random.int (i + 1) in let x = a.(k) in a.(k) <-
