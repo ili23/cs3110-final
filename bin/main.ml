@@ -2,6 +2,11 @@ open Game
 
 let remove_empty x = String.length x > 0
 
+let rec int_list_to_string lst =
+  match lst with
+  | [] -> ""
+  | h :: t -> string_of_int h ^ " " ^ int_list_to_string t
+
 let rec to_string lst =
   match lst with
   | [] -> ""
@@ -23,7 +28,24 @@ let rec add_player_x_times game counter = function
         (State.add_player game (initialize_name counter))
         (counter + 1) (x - 1)
 
-let start_game num = add_player_x_times State.init_state 0 num
+let initial_state num = add_player_x_times State.init_state 0 num
+
+let deal_cards state num =
+  State.updatePlayers state
+    (State.initialize_players_hands (State.getPlayerList state) State.fake_list)
+
+let rec printHand p_list =
+  match p_list with
+  | [] -> ()
+  | h :: t ->
+      print_endline
+        (State.getPlayerName h ^ "'s hand is: "
+        ^ int_list_to_string (State.getPlayerHand h));
+      printHand t
+
+let start_game num =
+  printHand (State.getPlayerList (deal_cards (initial_state num) num));
+  print_endline "Fire, let's get started!"
 
 let rec play_game number_player =
   match number_player with
