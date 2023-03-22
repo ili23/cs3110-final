@@ -35,12 +35,16 @@ let initialize_name i player =
   | [] -> { player with name = "Unknown Player" ^ string_of_int i }
   | h :: t -> { player with name = h ^ to_string t }
 
-let play_game number_player =
+let rec play_game number_player =
   match number_player with
-  | i when i < 5 ->
-      play_helper i;
-      exit 0
-  | i when i < 8 ->
+  | i when i < 3 ->
+      print_endline
+        "You can't start with less than 3 players, get some more friends. \n";
+      print_endline "Please enter the number of players for the game.\n";
+      print_string "> ";
+      let input = read_line () in
+      play_game (int_of_string input)
+  | i when i > 2 ->
       play_helper i;
       exit 0
   | _ -> exit 1
@@ -54,5 +58,6 @@ let main () =
   | exception End_of_file -> ()
   | number -> play_game (int_of_string number)
 
+(*Need to add a check here to make sure that the input is an int*)
 (* Execute the game engine. *)
 let () = main ()
