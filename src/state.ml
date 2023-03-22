@@ -15,6 +15,8 @@ type state = {
         to change*)
 }
 
+exception Filler
+
 let init_player name =
   { name; ready = false; id = -1; hand = []; score = 0; won_cards = [] }
 
@@ -40,3 +42,31 @@ let rec checkHand hand (card : int) =
   match hand with
   | [] -> false
   | h :: t -> if h == card then true else checkHand t card
+
+let checkPerson player card = checkHand player.hand card
+let addCard player card = { player with hand = card :: player.hand }
+
+let drawFromPile game player =
+  match game.deck with
+  | [] -> player
+  | h :: t -> { player with hand = h :: player.hand }
+
+(*The following functions are used to transfer cards from one player to
+  another*)
+let countCards card player =
+  List.length (List.filter (fun x -> x = card) player.hand)
+
+let deleteCards card player =
+  { player with hand = List.filter (fun x -> x <> card) player.hand }
+
+let rec repeatAddCard player card = function
+  | 0 -> player
+  | x -> repeatAddCard (addCard player card) card (x - 1)
+
+(*Need to call this each time we update player hands*)
+let rec updateGame game player =
+  match game.players with
+  | [] -> game
+  | h :: t ->
+      if h = player then { game with players = player :: t }
+      else updateGame game player

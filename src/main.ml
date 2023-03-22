@@ -1,5 +1,4 @@
 open Printf
-open Game
 
 type player = {
   name : string;
