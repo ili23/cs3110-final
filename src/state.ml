@@ -20,7 +20,8 @@ exception Filler
 let init_player name =
   { name; ready = false; id = -1; hand = []; score = 0; won_cards = [] }
 
-let init_state cards = { deck = cards; players = []; current_player = 0 }
+let init_state = { deck = []; players = []; current_player = 0 }
+let add_cards game deck = { game with deck }
 
 let add_player game_state player =
   { game_state with players = player :: game_state.players }
