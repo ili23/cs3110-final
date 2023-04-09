@@ -11,8 +11,6 @@ type state = {
   deck : int list;
   players : player list;
   current_player : int;
-      (*Could potentially swap this to player but this might be a little easier
-        to change*)
 }
 
 exception Filler
@@ -35,10 +33,8 @@ let rec assign_id_rec num p_list : player list =
 let assign_id game_state num =
   { game_state with players = assign_id_rec num game_state.players }
 
-(*Need to change the mod 4 to the number of players but we default to 4 players
-  for now*)
-let next_turn game_state =
-  { game_state with current_player = (game_state.current_player + 1) mod 4 }
+let next_turn game_state num =
+  { game_state with current_player = (game_state.current_player + 1) mod num }
 
 let rec checkHand hand (card : int) =
   match hand with

@@ -13,7 +13,8 @@ let rec to_string lst =
   | h :: t -> h ^ to_string t
 
 let initialize_name i =
-  print_endline ("Please enter the name of player " ^ string_of_int i);
+  print_endline
+    ("Please enter the name of player (must be a string) " ^ string_of_int i);
   print_string "> ";
   let words = String.split_on_char ' ' (read_line ()) in
   let full_words = List.filter remove_empty words in
@@ -62,7 +63,9 @@ let rec play_game number_player =
 (** [main ()] prompts for the game to play, then starts it. *)
 let main () =
   ANSITerminal.print_string [ ANSITerminal.blue ] "\n\n Welcome to Go Fish.\n";
-  print_endline "Please enter the number of players for the game.\n";
+  print_endline
+    "Please enter the number of players for the game. (Enter an integer less \
+     than 10)\n";
   print_string "> ";
   match read_line () with
   | exception End_of_file -> ()
