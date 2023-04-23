@@ -26,12 +26,12 @@ play:
 
 
 zip:
-	rm -f adventure.zip
-	zip -r adventure.zip . -x@exclude.lst
+	rm -f finalproject.zip
+	zip -r finalproject.zip . -x@exclude.lst
 
 clean:
 	dune clean
-	rm -f adventure.zip
+	rm -f finalproject.zip
 
 # potentially need to add this stuff although if we dont make any compilation units, we prolly don't need this 
 # doc:
