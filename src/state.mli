@@ -36,4 +36,5 @@ val get_player_name : player -> string
 val get_player_list : state -> player list
 (** [get_player_list st] shows the players in the game*)
 
-val fake_list : int list (* delete this once we have our shuffle function*)
+val shuffle : int list
+(** [shuffle] is a randomly shuffled deck of cards*)
