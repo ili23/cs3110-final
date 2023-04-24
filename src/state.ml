@@ -14,6 +14,7 @@ type state = {
 }
 
 exception Filler
+exception Temporary
 
 let init_player name =
   { name; ready = false; id = -1; hand = []; score = 0; won_cards = [] }
@@ -75,7 +76,15 @@ let update_players game p_list = { game with players = p_list }
 let get_player_list game = game.players
 let get_player_hand player = List.sort compare player.hand
 
-exception Temporary
+let rec check_quad_helper lst prev cnt =
+  match lst with
+  | [] -> if cnt = 4 then Some prev else None
+  | h :: t ->
+      if cnt = 4 then Some prev
+      else if h = prev then check_quad_helper t prev (cnt + 1)
+      else check_quad_helper t h 1
+
+let check_quad player = check_quad_helper player.hand 0 0
 
 (* let initialize_deck = let deck : int list = [] in for i = 1 to 13 do for j =
    1 to 4 do deck @ [ i ]; print_int (List.length deck) done done *)
@@ -196,6 +205,10 @@ let shuffle d =
   let nd = List.map (fun c -> (Random.bits (), c)) d in
   let sond = List.sort compare nd in
   List.map snd sond
+
+let gen_random_int bound =
+  Random.self_init ();
+  Random.int bound
 
 let rec initialize_players_hands players deck =
   match players with
