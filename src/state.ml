@@ -201,10 +201,76 @@ let fake_list =
     13;
   ]
 
-let shuffle d =
-  let nd = List.map (fun c -> (Random.bits (), c)) d in
-  let sond = List.sort compare nd in
-  List.map snd sond
+let gen_rand_int bound =
+  Random.self_init ();
+  Random.int bound
+
+let shuffle =
+  let d =
+    [|
+      1;
+      1;
+      1;
+      1;
+      2;
+      2;
+      2;
+      2;
+      3;
+      3;
+      3;
+      3;
+      4;
+      4;
+      4;
+      4;
+      5;
+      5;
+      5;
+      5;
+      6;
+      6;
+      6;
+      6;
+      7;
+      7;
+      7;
+      7;
+      8;
+      8;
+      8;
+      8;
+      9;
+      9;
+      9;
+      9;
+      10;
+      10;
+      10;
+      10;
+      11;
+      11;
+      11;
+      11;
+      12;
+      12;
+      12;
+      12;
+      13;
+      13;
+      13;
+      13;
+    |]
+  in
+  for x = 0 to 100 do
+    let x_1 = gen_rand_int 52 in
+    let x_2 = gen_rand_int 52 in
+    let x_1_value = Array.get d x_1 in
+    let x_2_value = Array.get d x_2 in
+    Array.set d x_2 x_1_value;
+    Array.set d x_1 x_2_value
+  done;
+  Array.to_list d
 
 let gen_random_int bound =
   Random.self_init ();

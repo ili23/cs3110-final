@@ -19,8 +19,9 @@ let initialize_name i =
   let words = String.split_on_char ' ' (read_line ()) in
   let full_words = List.filter remove_empty words in
   match full_words with
-  | [] -> State.init_player ("Unknown Player" ^ string_of_int i)
-  | h :: t -> State.init_player (h ^ to_string t)
+  | [] -> State.init_player ("Unknown_Player_" ^ string_of_int i)
+  | [ h ] -> State.init_player h
+  | h :: t -> State.init_player (h ^ "_" ^ to_string t)
 
 let rec add_player_x_times game counter = function
   | 0 -> game
@@ -33,9 +34,7 @@ let initial_state num = add_player_x_times State.init_state 0 num
 
 let deal_cards state num =
   State.update_players state
-    (State.initialize_players_hands
-       (State.get_player_list state)
-       State.fake_list)
+    (State.initialize_players_hands (State.get_player_list state) State.shuffle)
 
 let rec printHand p_list =
   match p_list with
