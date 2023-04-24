@@ -5,7 +5,7 @@
     the current turn's player, and the game deck. *)
 
 type player
-(** The abstract type of values representing a playe. *)
+(** The abstract type of values representing a player. *)
 
 type state
 (** The abstract type of values representing a game state. *)
@@ -13,20 +13,27 @@ type state
 val init_player : string -> player
 (** [init_player a] creates a player with the name a. *)
 
-val add_player : state -> player -> state
-(** [add_player st pl] adds player pl to state st. *)
-
-val getPlayerHand : player -> int list
-(** [getPlayerHand pl] shows player pl's hand. *)
-
-val getPlayerName : player -> string
-(** [getPlayerHand pl] shows player pl's name. *)
-
 val init_state : state
 (** [init_state] creates a new game with an empty deck and no players*)
 
-val getPlayerList : state -> player list
-(** [getPlayerList st] shows the players in the game*)
+val add_player : state -> player -> state
+(** [add_player st pl] adds player pl to state st. *)
 
 val initialize_players_hands : player list -> int list -> player list
-val updatePlayers : state -> player list -> state
+(** [initalize_players_hands pl deck] distributes five cards to each player in
+    pl from the deck.*)
+
+val update_players : state -> player list -> state
+(** [update_players st pl] updates st with the updated pl*)
+
+val get_player_hand : player -> int list
+(** [get_player_han pl] shows player pl's hand. The hand will be sorted
+    numerically. (Aces are considered the smallest in this game.)*)
+
+val get_player_name : player -> string
+(** [get_player_name pl] shows player pl's name. *)
+
+val get_player_list : state -> player list
+(** [get_player_list st] shows the players in the game*)
+
+val fake_list : int list (* delete this once we have our shuffle function*)

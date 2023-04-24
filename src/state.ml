@@ -20,7 +20,7 @@ let init_player name =
 
 let init_state = { deck = []; players = []; current_player = 0 }
 let add_cards game deck = { game with deck }
-let getPlayerName player = player.name
+let get_player_name player = player.name
 
 let add_player game_state player =
   { game_state with players = game_state.players @ [ player ] }
@@ -36,13 +36,15 @@ let assign_id game_state num =
 let next_turn game_state num =
   { game_state with current_player = (game_state.current_player + 1) mod num }
 
-let rec checkHand hand (card : int) =
+let rec check_hand hand (card : int) =
   match hand with
   | [] -> false
-  | h :: t -> if h == card then true else checkHand t card
+  | h :: t -> if h == card then true else check_hand t card
 
-let checkPerson player card = checkHand player.hand card
-let addCard player card = { player with hand = card :: player.hand }
+let check_person player card = check_hand player.hand card
+
+let add_card player card =
+  { player with hand = List.sort compare (card :: player.hand) }
 
 let drawFromPile game player =
   match game.deck with
@@ -51,27 +53,27 @@ let drawFromPile game player =
 
 (*The following functions are used to transfer cards from one player to
   another*)
-let countCards card player =
+let count_cards card player =
   List.length (List.filter (fun x -> x = card) player.hand)
 
-let deleteCards card player =
+let delete_cards card player =
   { player with hand = List.filter (fun x -> x <> card) player.hand }
 
-let rec repeatAddCard player card = function
+let rec repeat_add_card player card = function
   | 0 -> player
-  | x -> repeatAddCard (addCard player card) card (x - 1)
+  | x -> repeat_add_card (add_card player card) card (x - 1)
 
 (*Need to call this each time we update player hands*)
-let rec updatePlayer game player =
+let rec update_player game player =
   match game.players with
   | [] -> game
   | h :: t ->
       if h = player then { game with players = player :: t }
-      else updatePlayer game player
+      else update_player game player
 
-let updatePlayers game p_list = { game with players = p_list }
-let getPlayerList game = game.players
-let getPlayerHand player = player.hand
+let update_players game p_list = { game with players = p_list }
+let get_player_list game = game.players
+let get_player_hand player = List.sort compare player.hand
 
 exception Temporary
 

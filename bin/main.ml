@@ -32,20 +32,22 @@ let rec add_player_x_times game counter = function
 let initial_state num = add_player_x_times State.init_state 0 num
 
 let deal_cards state num =
-  State.updatePlayers state
-    (State.initialize_players_hands (State.getPlayerList state) State.fake_list)
+  State.update_players state
+    (State.initialize_players_hands
+       (State.get_player_list state)
+       State.fake_list)
 
 let rec printHand p_list =
   match p_list with
   | [] -> ()
   | h :: t ->
       print_endline
-        (State.getPlayerName h ^ "'s hand is: "
-        ^ int_list_to_string (State.getPlayerHand h));
+        (State.get_player_name h ^ "'s hand is: "
+        ^ int_list_to_string (State.get_player_hand h));
       printHand t
 
 let start_game num =
-  printHand (State.getPlayerList (deal_cards (initial_state num) num));
+  printHand (State.get_player_list (deal_cards (initial_state num) num));
   print_endline "Fire, let's get started!"
 
 let rec play_game number_player =
