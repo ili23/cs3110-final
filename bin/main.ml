@@ -71,12 +71,16 @@ let rec game_cycle (state : State.state) =
         game_cycle state)
 
 let start_game num =
-  printHand (State.get_player_list (deal_cards (initial_state num) num));
+  let clearTerminal : unit = print_endline "11111111 \n" in
+  (*printHand (State.get_player_list (deal_cards (initial_state num) num));*)
+  print_endline "Fire, let's get started!";
+  clearTerminal
+
+(**  printHand (State.get_player_list (deal_cards (initial_state num) num));
   print_endline
     "Request cards from a player by typing 'Request <player name> <card>'";
   print_endline "Fire, let's get started!";
-  game_cycle (deal_cards (initial_state num) num)
-
+  game_cycle (deal_cards (initial_state num) num)*)
 let rec play_game number_player =
   match number_player with
   | i when i < 3 ->
@@ -89,10 +93,6 @@ let rec play_game number_player =
   | i when i > 2 -> start_game i
   | _ -> exit 1
 
-
-let clearTerminal = 
-  print_endline "";
-  ()
 (** [main ()] prompts for the game to play, then starts it. *)
 let main () =
   ANSITerminal.print_string [ ANSITerminal.blue ] "\n\n Welcome to Go Fish.\n";

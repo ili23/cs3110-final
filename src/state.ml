@@ -179,6 +179,12 @@ let rec check_quad_helper lst prev cnt =
       else if h = prev then check_quad_helper t prev (cnt + 1)
       else check_quad_helper t h 1
 
+let rec get_turn id player_lst =
+  match player_lst with
+  | [] -> raise NoPlayer
+  | h :: t -> if h.id = id then h else get_turn id t
+
+let get_current_player state = get_turn state.current_player state.players
 let check_quad player = check_quad_helper player.hand 0 0
 
 (* let initialize_deck = let deck : int list = [] in for i = 1 to 13 do for j =
