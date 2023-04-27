@@ -17,10 +17,81 @@ exception Filler
 exception Temporary
 exception NoCardsLeft
 
+let gen_rand_int bound =
+  Random.self_init ();
+  Random.int bound
+
+let shuffle =
+  let d =
+    [|
+      1;
+      1;
+      1;
+      1;
+      2;
+      2;
+      2;
+      2;
+      3;
+      3;
+      3;
+      3;
+      4;
+      4;
+      4;
+      4;
+      5;
+      5;
+      5;
+      5;
+      6;
+      6;
+      6;
+      6;
+      7;
+      7;
+      7;
+      7;
+      8;
+      8;
+      8;
+      8;
+      9;
+      9;
+      9;
+      9;
+      10;
+      10;
+      10;
+      10;
+      11;
+      11;
+      11;
+      11;
+      12;
+      12;
+      12;
+      12;
+      13;
+      13;
+      13;
+      13;
+    |]
+  in
+  for x = 0 to 100 do
+    let x_1 = gen_rand_int 52 in
+    let x_2 = gen_rand_int 52 in
+    let x_1_value = Array.get d x_1 in
+    let x_2_value = Array.get d x_2 in
+    Array.set d x_2 x_1_value;
+    Array.set d x_1 x_2_value
+  done;
+  Array.to_list d
+
 let init_player name =
   { name; ready = false; id = -1; hand = []; score = 0; won_cards = [] }
 
-let init_state = { deck = []; players = []; current_player = 0 }
+let init_state = { deck = shuffle; players = []; current_player = 0 }
 let add_cards game deck = { game with deck }
 let get_player_name player = player.name
 
@@ -99,137 +170,6 @@ let check_quad player = check_quad_helper player.hand 0 0
 
 (* let initialize_deck = let deck : int list = [] in for i = 1 to 13 do for j =
    1 to 4 do deck @ [ i ]; print_int (List.length deck) done done *)
-
-let initialize_deck : int list =
-  [
-    1;
-    1;
-    1;
-    1;
-    2;
-    2;
-    2;
-    2;
-    3;
-    3;
-    3;
-    3;
-    4;
-    4;
-    4;
-    4;
-    5;
-    5;
-    5;
-    5;
-    6;
-    6;
-    6;
-    6;
-    7;
-    7;
-    7;
-    7;
-    8;
-    8;
-    8;
-    8;
-    9;
-    9;
-    9;
-    9;
-    10;
-    10;
-    10;
-    10;
-    11;
-    11;
-    11;
-    11;
-    12;
-    12;
-    12;
-    12;
-    13;
-    13;
-    13;
-    13;
-  ]
-
-let gen_rand_int bound =
-  Random.self_init ();
-  Random.int bound
-
-let shuffle =
-  let d =
-    [|
-      1;
-      1;
-      1;
-      1;
-      2;
-      2;
-      2;
-      2;
-      3;
-      3;
-      3;
-      3;
-      4;
-      4;
-      4;
-      4;
-      5;
-      5;
-      5;
-      5;
-      6;
-      6;
-      6;
-      6;
-      7;
-      7;
-      7;
-      7;
-      8;
-      8;
-      8;
-      8;
-      9;
-      9;
-      9;
-      9;
-      10;
-      10;
-      10;
-      10;
-      11;
-      11;
-      11;
-      11;
-      12;
-      12;
-      12;
-      12;
-      13;
-      13;
-      13;
-      13;
-    |]
-  in
-  for x = 0 to 100 do
-    let x_1 = gen_rand_int 52 in
-    let x_2 = gen_rand_int 52 in
-    let x_1_value = Array.get d x_1 in
-    let x_2_value = Array.get d x_2 in
-    Array.set d x_2 x_1_value;
-    Array.set d x_1 x_2_value
-  done;
-  Array.to_list d
-
-let gen_random_int bound =
-  Random.self_init ();
-  Random.int bound
 
 let rec initialize_players_hands players deck =
   match players with
