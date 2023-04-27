@@ -32,7 +32,28 @@ let player0 = State.init_player "Hog Rider"
 let player1 = State.init_player "Musketeer"
 let player2 = State.init_player "Goblin"
 let player3 = State.init_player "Dragon"
-let state_tests = []
+
+let state_tests =
+  [
+    ( "Adding player 0 into game." >:: fun _ ->
+      assert_equal [ player0 ]
+        (State.add_player player0 empty_game |> State.get_player_list) );
+    ( "Adding player 0 and player 1 into game." >:: fun _ ->
+      assert_equal [ player0; player1 ]
+        (State.add_player player0 empty_game
+        |> State.add_player player1 |> State.get_player_list) );
+    ( "Adding player 1 and player 0 into game." >:: fun _ ->
+      assert_equal [ player1; player0 ]
+        (State.add_player player1 empty_game
+        |> State.add_player player0 |> State.get_player_list) )
+    (* ( "Check if player0 has the card 1." >:: fun _ -> assert_equal true
+       (State.add_player player1 empty_game |> State.add_player player0 |>
+       State.add_player player2 |> State.get_player_list |>
+       State.initialize_players_hands State.shuffle |> State.check_person
+       player0 1) ); *);
+  ]
+
+(** still need to test assign_id, next_turn*)
 
 (****************************************************************************
   Running the full test suite
