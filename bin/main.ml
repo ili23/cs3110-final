@@ -27,7 +27,7 @@ let rec add_player_x_times game counter = function
   | 0 -> game
   | x ->
       add_player_x_times
-        (State.add_player game (initialize_name counter))
+        (State.add_player (initialize_name counter) game)
         (counter + 1) (x - 1)
 
 let initial_state num = add_player_x_times State.init_state 0 num
@@ -46,8 +46,10 @@ let rec printHand p_list =
       printHand t
 
 let start_game num =
-  printHand (State.get_player_list (deal_cards (initial_state num) num));
-  print_endline "Fire, let's get started!"
+  let clearTerminal : unit = print_endline "11111111 \n" in
+  (*printHand (State.get_player_list (deal_cards (initial_state num) num));*)
+  print_endline "Fire, let's get started!";
+  clearTerminal
 
 let rec play_game number_player =
   match number_player with
@@ -61,10 +63,6 @@ let rec play_game number_player =
   | i when i > 2 -> start_game i
   | _ -> exit 1
 
-
-let clearTerminal = 
-  print_endline "";
-  ()
 (** [main ()] prompts for the game to play, then starts it. *)
 let main () =
   ANSITerminal.print_string [ ANSITerminal.blue ] "\n\n Welcome to Go Fish.\n";

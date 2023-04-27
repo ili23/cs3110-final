@@ -45,3 +45,5 @@ val remove_top_card : int list -> int list
 
 val remove_cards : int -> int list -> int list
 (** [remove_cards num deck] removes the top num cards from the deck. *)
+
+val get_current_player : state -> player
