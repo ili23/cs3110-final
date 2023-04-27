@@ -19,7 +19,10 @@ val init_state : state
 val add_player : player -> state -> state
 (** [add_player st pl] adds player pl to state st. *)
 
-val initialize_players_hands : player list -> int list -> player list
+val check_person : player -> int -> bool
+(** [check_person pl c] checks if player pl has card c in their hand. *)
+
+val initialize_players_hands : int list -> player list -> player list
 (** [initalize_players_hands pl deck] distributes five cards to each player in
     pl from the deck.*)
 
@@ -39,6 +42,9 @@ val get_player_list : state -> player list
 val shuffle : int list
 (** [shuffle] is a randomly shuffled deck of cards*)
 
+val has_card : int -> player -> bool
+(** [has_card card player] returns if the player has a card of type card. *)
+
 val remove_top_card : int list -> int list
 (** [remove_top_card deck] removes the top card of a non-empty deck. If the deck
     is empty, it raises exception NoCardsLeft*)
@@ -47,3 +53,10 @@ val remove_cards : int -> int list -> int list
 (** [remove_cards num deck] removes the top num cards from the deck. *)
 
 val get_current_player : state -> player
+
+val exchange_cards : player -> player -> int -> state -> state
+(** [exchange_cards receiver sender card game] is the new state after cards of
+    type card are moved from the sender to the receiver *)
+
+val find_player : string -> player list -> player
+
