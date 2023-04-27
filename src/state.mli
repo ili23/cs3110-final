@@ -42,12 +42,19 @@ val get_player_list : state -> player list
 val shuffle : int list
 (** [shuffle] is a randomly shuffled deck of cards*)
 
+val has_card : int -> player -> bool
+(** [has_card card player] returns if the player has a card of type card. *)
+
 val remove_top_card : int list -> int list
 (** [remove_top_card deck] removes the top card of a non-empty deck. If the deck
     is empty, it raises exception NoCardsLeft*)
 
 val remove_cards : int -> int list -> int list
 (** [remove_cards num deck] removes the top num cards from the deck. *)
+
+val exchange_cards : player -> player -> int -> state -> state
+(** [exchange_cards receiver sender card game] is the new state after cards of
+    type card are moved from the sender to the receiver *)
 
 val find_player : string -> player list -> player
 (** [find_player name players] returns the player with name 'name'. *)
