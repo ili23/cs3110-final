@@ -45,9 +45,37 @@ let rec printHand p_list =
         ^ int_list_to_string (State.get_player_hand h));
       printHand t
 
+let parse_command state =
+  print_endline "Please request a card from a player";
+  print_string "> ";
+  try Command.parse (read_line ())
+  with Command.Unrecognized | Command.Empty ->
+    print_endline "Invalid request given. Enter another request.";
+    raise Command.Empty
+
+let rec name_check (name : string) player_list =
+  match player_list with
+  | [] -> false
+  | h :: t -> if State.get_player_name h = name then true else name_check name t
+
+(* let rec game_cycle (state : State.state) =
+  match parse_command state with
+  | Command.Request (name, number) ->
+    let players = (State.get_player_list state) in
+      if name_check name players then
+        let new_state = (State.exchange_cards (State.get_current_player) 
+        (State.find_player name players) number state) in 
+        let newest = State.next_turn in game_cycle new_state
+      else (
+        print_endline "Invalid name. Enter another command";
+        game_cycle state) *)
+
 let start_game num =
   printHand (State.get_player_list (deal_cards (initial_state num) num));
-  print_endline "Fire, let's get started!"
+  print_endline
+    "Request cards from a player by typing 'Request <player name> <card>'";
+  print_endline "Fire, let's get started!";
+  (* game_cycle (deal_cards (initial_state num) num) *)
 
 let rec play_game number_player =
   match number_player with
@@ -61,6 +89,10 @@ let rec play_game number_player =
   | i when i > 2 -> start_game i
   | _ -> exit 1
 
+
+let clearTerminal = 
+  print_endline "";
+  ()
 (** [main ()] prompts for the game to play, then starts it. *)
 let main () =
   ANSITerminal.print_string [ ANSITerminal.blue ] "\n\n Welcome to Go Fish.\n";

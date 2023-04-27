@@ -16,6 +16,7 @@ type state = {
 exception Filler
 exception Temporary
 exception NoCardsLeft
+exception NoPlayer
 
 let gen_rand_int bound =
   Random.self_init ();
@@ -170,7 +171,7 @@ let check_quad player = check_quad_helper player.hand 0 0
 (* let initialize_deck = let deck : int list = [] in for i = 1 to 13 do for j =
    1 to 4 do deck @ [ i ]; print_int (List.length deck) done done *)
 
-let rec initialize_players_hands players deck =
+let rec initialize_players_hands deck players =
   match players with
   | [ h ] -> (
       match deck with
@@ -181,6 +182,11 @@ let rec initialize_players_hands players deck =
       match deck with
       | h1 :: h2 :: h3 :: h4 :: h5 :: q ->
           { h with hand = h1 :: h2 :: h3 :: h4 :: h5 :: h.hand }
-          :: initialize_players_hands t q
+          :: initialize_players_hands q t
       | _ -> raise Temporary)
   | [] -> raise Temporary
+
+let rec find_player name player_list =
+  match player_list with
+  | [] -> raise NoPlayer
+  | h :: t -> if h.name = name then h else find_player name t
