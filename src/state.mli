@@ -19,6 +19,10 @@ val init_state : state
 val add_player : player -> state -> state
 (** [add_player st pl] adds player pl to state st. *)
 
+val next_turn : state -> int -> state
+(** [next_turn st turn] is the state with the current turn rotated to the next
+    person. *)
+
 val check_person : player -> int -> bool
 (** [check_person pl c] checks if player pl has card c in their hand. *)
 
@@ -59,4 +63,3 @@ val exchange_cards : player -> player -> int -> state -> state
     type card are moved from the sender to the receiver *)
 
 val find_player : string -> player list -> player
-

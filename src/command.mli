@@ -8,7 +8,9 @@ type object_tuple = string * int
     deck. The integer must be between 1 and 13, inclusive. *)
 
 (** The type [command] represents a player command that consists of a verb and an object_tuple. Invariant: the [object_tuple] carried by Request] must not be empty. *)
-type command = Request of object_tuple
+type command =
+  | Request of object_tuple
+  | Quit
 
 exception Unrecognized
 (** Raised when an unrecognized command is parsed. *)
