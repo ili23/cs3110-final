@@ -61,11 +61,17 @@ let rec name_check (name : string) player_list =
 let rec game_cycle (state : State.state) =
   match parse_command state with
   | Command.Request (name, number) ->
-    let players = (State.get_player_list state) in
-      if name_check name players then
-        let new_state = (State.exchange_cards (State.get_current_player) 
-        (State.find_player name players) number state) in 
-        let newest = State.next_turn in game_cycle new_state
+      let players = State.get_player_list state in
+      let current_player = State.get_current_player state in
+      if name_check name players && name <> State.get_player_name current_player
+      then
+        let new_state =
+          State.exchange_cards current_player
+            (State.find_player name players)
+            number state
+        in
+        let newest = State.next_turn in
+        game_cycle new_state
       else (
         print_endline "Invalid name. Enter another command";
         game_cycle state)
@@ -76,11 +82,10 @@ let start_game num =
   print_endline "Fire, let's get started!";
   clearTerminal
 
-(**  printHand (State.get_player_list (deal_cards (initial_state num) num));
-  print_endline
-    "Request cards from a player by typing 'Request <player name> <card>'";
-  print_endline "Fire, let's get started!";
-  game_cycle (deal_cards (initial_state num) num)*)
+(** printHand (State.get_player_list (deal_cards (initial_state num) num));
+    print_endline "Request cards from a player by typing 'Request <player name>
+    <card>'"; print_endline "Fire, let's get started!"; game_cycle (deal_cards
+    (initial_state num) num)*)
 let rec play_game number_player =
   match number_player with
   | i when i < 3 ->
