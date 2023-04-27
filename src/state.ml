@@ -15,6 +15,7 @@ type state = {
 
 exception Filler
 exception Temporary
+exception NoCardsLeft
 
 let init_player name =
   { name; ready = false; id = -1; hand = []; score = 0; won_cards = [] }
@@ -46,6 +47,16 @@ let check_person player card = check_hand player.hand card
 
 let add_card player card =
   { player with hand = List.sort compare (card :: player.hand) }
+
+let remove_top_card deck =
+  match deck with
+  | [] -> raise NoCardsLeft
+  | h :: t -> t
+
+let rec remove_cards num deck =
+  match num with
+  | 0 -> deck
+  | x -> remove_cards (x - 1) (remove_top_card deck)
 
 let drawFromPile game player =
   match game.deck with
@@ -145,62 +156,6 @@ let initialize_deck : int list =
     13;
   ]
 
-let fake_list =
-  [
-    3;
-    1;
-    10;
-    7;
-    3;
-    2;
-    6;
-    2;
-    12;
-    1;
-    3;
-    2;
-    11;
-    11;
-    4;
-    4;
-    13;
-    5;
-    5;
-    9;
-    6;
-    6;
-    2;
-    6;
-    7;
-    1;
-    9;
-    7;
-    8;
-    8;
-    10;
-    8;
-    9;
-    5;
-    9;
-    7;
-    10;
-    8;
-    10;
-    1;
-    4;
-    11;
-    4;
-    13;
-    12;
-    3;
-    12;
-    12;
-    13;
-    5;
-    11;
-    13;
-  ]
-
 let gen_rand_int bound =
   Random.self_init ();
   Random.int bound
@@ -290,11 +245,3 @@ let rec initialize_players_hands players deck =
           :: initialize_players_hands t q
       | _ -> raise Temporary)
   | [] -> raise Temporary
-
-(* let rec initialize_players_hands state players deck = match players with | [
-   h ] -> ( match deck with | h1 :: h2 :: h3 :: h4 :: h5 :: q -> { state with
-   players = [ { h with hand = h1 :: h2 :: h3 :: h4 :: h5 :: h.hand } ]; deck =
-   q; } | _ -> raise Temporary) | h :: t -> ( match deck with | h1 :: h2 :: h3
-   :: h4 :: h5 :: q -> initialize_players_hands { state with players =
-   state.players @ [ { h with hand = h1 :: h2 :: h3 :: h4 :: h5 :: h.hand } ];
-   deck = q; } t q | _ -> raise Temporary) | [] -> raise Temporary *)
