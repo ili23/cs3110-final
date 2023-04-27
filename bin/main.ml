@@ -27,7 +27,7 @@ let rec add_player_x_times game counter = function
   | 0 -> game
   | x ->
       add_player_x_times
-        (State.add_player game (initialize_name counter))
+        (State.add_player  (initialize_name counter) game)
         (counter + 1) (x - 1)
 
 let initial_state num = add_player_x_times State.init_state 0 num
@@ -58,21 +58,24 @@ let rec name_check (name : string) player_list =
   | [] -> false
   | h :: t -> if State.get_player_name h = name then true else name_check name t
 
-let rec game_cycle (state : State.state) =
+(* let rec game_cycle (state : State.state) =
   match parse_command state with
   | Command.Request (name, number) ->
-      if name_check name (State.get_player_list state) then
-        State.get_player_hand
+    let players = (State.get_player_list state) in
+      if name_check name players then
+        let new_state = (State.exchange_cards (State.get_current_player) 
+        (State.find_player name players) number state) in 
+        let newest = State.next_turn in game_cycle new_state
       else (
         print_endline "Invalid name. Enter another command";
-        game_cycle state)
+        game_cycle state) *)
 
 let start_game num =
   printHand (State.get_player_list (deal_cards (initial_state num) num));
   print_endline
     "Request cards from a player by typing 'Request <player name> <card>'";
   print_endline "Fire, let's get started!";
-  game_cycle (deal_cards (initial_state num) num)
+  (* game_cycle (deal_cards (initial_state num) num) *)
 
 let rec play_game number_player =
   match number_player with
