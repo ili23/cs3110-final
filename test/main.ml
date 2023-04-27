@@ -5,11 +5,11 @@ open Game
   Helper functions to pretty print various data structures needed in testing.
   ***************************************************************************)
 
-(** [pp_string s] pretty-prints string [s]. Function *)
+(** [pp_string s] pretty-prints string [s]. Source: A2 Test Suite*)
 let pp_string s = "\"" ^ s ^ "\""
 
 (** [pp_list pp_elt lst] pretty-prints list [lst], using [pp_elt] to
-    pretty-print each element of [lst]. *)
+    pretty-print each element of [lst]. Source: A2 Test Suite*)
 let pp_list pp_elt lst =
   let pp_elts lst =
     let rec loop n acc = function

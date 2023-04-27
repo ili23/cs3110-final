@@ -38,3 +38,10 @@ val get_player_list : state -> player list
 
 val shuffle : int list
 (** [shuffle] is a randomly shuffled deck of cards*)
+
+val remove_top_card : int list -> int list
+(** [remove_top_card deck] removes the top card of a non-empty deck. If the deck
+    is empty, it raises exception NoCardsLeft*)
+
+val remove_cards : int -> int list -> int list
+(** [remove_cards num deck] removes the top num cards from the deck. *)
