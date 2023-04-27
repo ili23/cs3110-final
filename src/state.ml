@@ -139,6 +139,8 @@ let drawFromPile game player =
 let count_cards card player =
   List.length (List.filter (fun x -> x = card) player.hand)
 
+let has_card card player = count_cards card player > 0
+
 let delete_cards card player =
   { player with hand = List.filter (fun x -> x <> card) player.hand }
 
@@ -147,19 +149,30 @@ let rec repeat_add_card player card = function
   | x -> repeat_add_card (add_card player card) card (x - 1)
 
 (*Need to call this each time we update player hands*)
-let rec update_player game player =
-  match game.players with
-  | [] -> game
-  | h :: t ->
-      if h = player then { game with players = player :: t }
-      else update_player game player
+
+let rec update_player_list player_list player new_player =
+  match player_list with
+  | [] -> []
+  | h :: t when h = player ->
+      new_player :: update_player_list t player new_player
+  | h :: t -> h :: update_player_list t player new_player
+
+let rec update_player game player new_player =
+  { game with players = update_player_list game.players player new_player }
 
 let update_players game p_list = { game with players = p_list }
 let get_player_list game = game.players
 let get_player_hand player = List.sort compare player.hand
 
+let exchange_cards receiver sender card game =
+  let count = count_cards card sender in
+  let new_sender = delete_cards card sender in
+  let send_state = update_player game sender new_sender in
+  let new_receiver = repeat_add_card receiver card count in
+  update_player send_state receiver new_receiver
+
 let rec check_quad_helper lst prev cnt =
-  match lst with
+  match List.sort compare lst with
   | [] -> if cnt = 4 then Some prev else None
   | h :: t ->
       if cnt = 4 then Some prev
