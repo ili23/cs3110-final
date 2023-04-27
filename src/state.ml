@@ -92,10 +92,9 @@ let init_player name =
   { name; ready = false; id = -1; hand = []; score = 0; won_cards = [] }
 
 let init_state = { deck = shuffle; players = []; current_player = 0 }
-let add_cards game deck = { game with deck }
 let get_player_name player = player.name
 
-let add_player game_state player =
+let add_player player game_state =
   { game_state with players = game_state.players @ [ player ] }
 
 let rec assign_id_rec num p_list : player list =

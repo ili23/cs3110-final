@@ -16,7 +16,7 @@ val init_player : string -> player
 val init_state : state
 (** [init_state] creates a new game with an empty deck and no players*)
 
-val add_player : state -> player -> state
+val add_player : player -> state -> state
 (** [add_player st pl] adds player pl to state st. *)
 
 val initialize_players_hands : player list -> int list -> player list
