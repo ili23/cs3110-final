@@ -27,14 +27,14 @@ let rec add_player_x_times game counter = function
   | 0 -> game
   | x ->
       add_player_x_times
-        (State.add_player game (initialize_name counter))
+        (State.add_player (initialize_name counter) game)
         (counter + 1) (x - 1)
 
 let initial_state num = add_player_x_times State.init_state 0 num
 
 let deal_cards state num =
   State.update_players state
-    (State.initialize_players_hands (State.get_player_list state) State.shuffle)
+    (State.initialize_players_hands State.shuffle (State.get_player_list state))
 
 let rec printHand p_list =
   match p_list with
