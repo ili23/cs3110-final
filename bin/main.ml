@@ -61,6 +61,10 @@ let rec play_game number_player =
   | i when i > 2 -> start_game i
   | _ -> exit 1
 
+
+let clearTerminal = 
+  print_endline "";
+  ()
 (** [main ()] prompts for the game to play, then starts it. *)
 let main () =
   ANSITerminal.print_string [ ANSITerminal.blue ] "\n\n Welcome to Go Fish.\n";

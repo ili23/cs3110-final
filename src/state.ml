@@ -16,6 +16,7 @@ type state = {
 exception Filler
 exception Temporary
 exception NoCardsLeft
+exception NoPlayer
 
 let gen_rand_int bound =
   Random.self_init ();
@@ -184,3 +185,8 @@ let rec initialize_players_hands players deck =
           :: initialize_players_hands t q
       | _ -> raise Temporary)
   | [] -> raise Temporary
+
+let rec find_player name player_list =
+  match player_list with
+  | [] -> raise NoPlayer
+  | h :: t -> if h.name = name then h else find_player name t
