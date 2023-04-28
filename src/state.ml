@@ -98,13 +98,13 @@ let get_player_name player = player.name
 let add_player player game_state =
   { game_state with players = game_state.players @ [ player ] }
 
-let rec assign_id_rec num p_list : player list =
+let rec assign_id_rec index p_list : player list =
   match p_list with
-  | [] -> p_list
-  | h :: t -> assign_id_rec (num + 1) ({ h with id = num } :: t)
+  | [] -> []
+  | h :: t -> { h with id = index } :: assign_id_rec (index + 1) t
 
 let assign_id game_state num =
-  { game_state with players = assign_id_rec num game_state.players }
+  { game_state with players = assign_id_rec 0 game_state.players }
 
 let next_turn game_state num =
   { game_state with current_player = (game_state.current_player + 1) mod num }

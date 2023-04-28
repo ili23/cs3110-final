@@ -46,6 +46,10 @@ val get_player_list : state -> player list
 val shuffle : int list
 (** [shuffle] is a randomly shuffled deck of cards*)
 
+val count_cards : int -> player -> int
+(** [count_cards card player] returns the number of cards of type card the
+    player has. *)
+
 val has_card : int -> player -> bool
 (** [has_card card player] returns if the player has a card of type card. *)
 
@@ -63,3 +67,4 @@ val exchange_cards : player -> player -> int -> state -> state
     type card are moved from the sender to the receiver *)
 
 val find_player : string -> player list -> player
+val assign_id : state -> int -> state

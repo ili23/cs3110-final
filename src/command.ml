@@ -12,9 +12,9 @@ let rec parse_helper str =
   let filtered = List.filter (fun item -> item <> "") split in
   match filtered with
   | [] -> raise Empty
+  | [ h ] when h = "quit" -> Quit
   | [ h; t1; t2 ] when h = "request" && List.length filtered > 2 ->
       Request (t1, int_of_string t2)
-  | [ h ] when h = "quit" -> Quit
   | _ -> raise Unrecognized
 
 let parse str = parse_helper str
