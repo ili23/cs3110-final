@@ -23,62 +23,12 @@ let gen_rand_int bound =
   Random.int bound
 
 let shuffle =
-  let d =
-    [|
-      1;
-      1;
-      1;
-      1;
-      2;
-      2;
-      2;
-      2;
-      3;
-      3;
-      3;
-      3;
-      4;
-      4;
-      4;
-      4;
-      5;
-      5;
-      5;
-      5;
-      6;
-      6;
-      6;
-      6;
-      7;
-      7;
-      7;
-      7;
-      8;
-      8;
-      8;
-      8;
-      9;
-      9;
-      9;
-      9;
-      10;
-      10;
-      10;
-      10;
-      11;
-      11;
-      11;
-      11;
-      12;
-      12;
-      12;
-      12;
-      13;
-      13;
-      13;
-      13;
-    |]
-  in
+  let d = Array.make 52 1 in
+  for x = 1 to 13 do
+    for y = 0 to 3 do
+      Array.set d ((4 * (x - 1)) + y) x
+    done
+  done;
   for x = 0 to 100 do
     let x_1 = gen_rand_int 52 in
     let x_2 = gen_rand_int 52 in
