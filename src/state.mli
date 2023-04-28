@@ -30,6 +30,9 @@ val initialize_players_hands : int list -> player list -> player list
 (** [initalize_players_hands pl deck] distributes five cards to each player in
     pl from the deck.*)
 
+val update_player : state -> player -> player -> state
+(** [update_player st pl new_pl] updates st with new_pl replacing pl*)
+
 val update_players : state -> player list -> state
 (** [update_players st pl] updates st with the updated pl*)
 
@@ -54,6 +57,10 @@ val has_card : int -> player -> bool
 (** [has_card card player] returns if the player has a card of type card. *)
 
 val remove_top_card : int list -> int list
+(** [remove_top_card deck] removes the top card of a non-empty deck. If the deck
+    is empty, it raises exception NoCardsLeft*)
+
+val draw_from_pile : state -> player -> player
 (** [remove_top_card deck] removes the top card of a non-empty deck. If the deck
     is empty, it raises exception NoCardsLeft*)
 

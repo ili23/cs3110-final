@@ -79,7 +79,7 @@ let rec remove_cards num deck =
   | 0 -> deck
   | x -> remove_cards (x - 1) (remove_top_card deck)
 
-let drawFromPile game player =
+let draw_from_pile game player =
   match game.deck with
   | [] -> player
   | h :: t -> { player with hand = h :: player.hand }

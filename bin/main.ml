@@ -82,7 +82,10 @@ let one_turn state name card num =
     new_state)
   else (
     print_endline "Go Fish";
-    let newest = State.next_turn state num in
+    let new_draw_player = State.draw_from_pile state current_player in
+    let new_state = State.update_player state current_player new_draw_player in
+    let newest = State.next_turn new_state num in
+    print_endline "drawn from pile";
     newest)
 
 let rec game_cycle (state : State.state) num =
