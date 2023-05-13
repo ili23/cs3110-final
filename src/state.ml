@@ -98,6 +98,11 @@ let rec check_hand hand (card : int) =
 
 let check_person player card = check_hand player.hand card
 
+let check_deck state =
+  match state.deck with
+  | [] -> false
+  | h :: t -> true
+
 let add_card player card =
   { player with hand = List.sort compare (card :: player.hand) }
 
