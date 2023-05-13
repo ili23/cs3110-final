@@ -151,15 +151,16 @@ let check_person player card = check_hand player.hand card
 let add_card player card =
   { player with hand = List.sort compare (card :: player.hand) }
 
-let remove_top_card deck =
+let remove_top_card_help deck =
   match deck with
   | [] -> raise NoCardsLeft
   | h :: t -> t
 
-let rec remove_cards num deck =
+(** Used to remove num top cards in deck.*)
+let rec remove_card_top num deck =
   match num with
   | 0 -> deck
-  | x -> remove_cards (x - 1) (remove_top_card deck)
+  | x -> remove_card_top (x - 1) (remove_top_card_help deck)
 
 let drawFromPile game player =
   match game.deck with

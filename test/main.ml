@@ -6,9 +6,6 @@ open Game
   testing.
   ***************************************************************************)
 
-(** [pp_string s] pretty-prints string [s]. Source: A2 Test Suite*)
-let pp_string s = "\"" ^ s ^ "\""
-
 (** [pp_list pp_elt lst] pretty-prints list [lst], using [pp_elt] to
     pretty-print each element of [lst]. Source: A2 Test Suite*)
 let pp_list pp_elt lst =
@@ -148,6 +145,7 @@ let game_tests =
   Running the full test suite
   ***************************************************************************)
 let suite =
-  "test suite for A2" >::: List.flatten [ initialization_tests; game_tests ]
+  "Test Suite for State Functions"
+  >::: List.flatten [ initialization_tests; game_tests ]
 
 let _ = run_test_tt_main suite
