@@ -1,3 +1,6 @@
+(****************************************************************************
+  Types for data structures in states.
+  ***************************************************************************)
 type player = {
   name : string;
   ready : bool;
@@ -13,11 +16,17 @@ type state = {
   current_player : int;
 }
 
+(****************************************************************************
+  Exceptions needed for states.
+  ***************************************************************************)
 exception Filler
 exception Temporary
 exception NoCardsLeft
 exception NoPlayer
 
+(****************************************************************************
+  Helper functions for general state funtions.
+  ***************************************************************************)
 let gen_rand_int bound =
   Random.self_init ();
   Random.int bound
@@ -39,25 +48,48 @@ let shuffle =
   done;
   Array.to_list d
 
+(****************************************************************************
+  Functions that create/set/change states.
+  ***************************************************************************)
 let init_player name =
   { name; ready = false; id = -1; hand = []; score = 0; won_cards = [] }
 
 let init_state = { deck = shuffle; players = []; current_player = 0 }
-let get_player_name player = player.name
 
 let add_player player game_state =
   { game_state with players = game_state.players @ [ player ] }
 
 let rec assign_id_rec index p_list : player list =
   match p_list with
-  | [] -> []
-  | h :: t -> { h with id = index } :: assign_id_rec (index + 1) t
+  | [] -> p_list
+  | h :: t -> { h with id = num } :: assign_id_rec (num + 1) t
 
 let assign_id game_state num =
   { game_state with players = assign_id_rec 0 game_state.players }
 
-let next_turn game_state num =
+let next_turn num game_state =
   { game_state with current_player = (game_state.current_player + 1) mod num }
+
+(****************************************************************************
+  Functions that get information about states.
+  ***************************************************************************)
+let get_deck state = state.deck
+let get_current_player_state state = state.current_player
+let get_id player = player.id
+
+let get_current_player state =
+  let rec get_turn id player_lst =
+    match player_lst with
+    | [] -> raise NoPlayer (*Impossible*)
+    | h :: t -> if h.id = id then h else get_turn id t
+  in
+  get_turn state.current_player state.players
+
+let get_player_name player = player.name
+
+(****************************************************************************
+  Other functions related to states.
+  ***************************************************************************)
 
 let rec check_hand hand (card : int) =
   match hand with
@@ -69,19 +101,20 @@ let check_person player card = check_hand player.hand card
 let add_card player card =
   { player with hand = List.sort compare (card :: player.hand) }
 
-let remove_top_card deck =
+let remove_top_card_help deck =
   match deck with
   | [] -> raise NoCardsLeft
   | h :: t -> t
 
-let rec remove_cards num deck =
+(** Used to remove num top cards in deck.*)
+let rec remove_card_top num deck =
   match num with
   | 0 -> deck
-  | x -> remove_cards (x - 1) (remove_top_card deck)
+  | x -> remove_card_top (x - 1) (remove_top_card_help deck)
 
 let draw_from_pile game player =
   match game.deck with
-  | [] -> player
+  | [] -> raise NoCardsLeft
   | h :: t -> { player with hand = h :: player.hand }
 
 (*The following functions are used to transfer cards from one player to
@@ -121,21 +154,16 @@ let exchange_cards receiver sender card game =
   let new_receiver = repeat_add_card receiver card count in
   update_player send_state receiver new_receiver
 
-let rec check_quad_helper lst prev cnt =
+let rec check_quad_helper lst prev cnt acc =
   match List.sort compare lst with
-  | [] -> if cnt = 4 then Some prev else None
+  | [] -> if cnt = 4 then prev :: acc else acc
   | h :: t ->
-      if cnt = 4 then Some prev
-      else if h = prev then check_quad_helper t prev (cnt + 1)
-      else check_quad_helper t h 1
+      if cnt = 4 then check_quad_helper t h 1 (prev :: acc)
+      else if h = prev then check_quad_helper t prev (cnt + 1) acc
+      else check_quad_helper t h 1 acc
 
-let rec get_turn id player_lst =
-  match player_lst with
-  | [] -> raise NoPlayer
-  | h :: t -> if h.id = id then h else get_turn id t
-
-let get_current_player state = get_turn state.current_player state.players
-let check_quad player = check_quad_helper player.hand 0 0
+(** will return [] if no quads, otherwise will return nonempty list*)
+let check_quad player = check_quad_helper player.hand 0 0 []
 
 (* let initialize_deck = let deck : int list = [] in for i = 1 to 13 do for j =
    1 to 4 do deck @ [ i ]; print_int (List.length deck) done done *)

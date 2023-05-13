@@ -67,6 +67,7 @@ let rec name_check (name : string) player_list =
   | [] -> false
   | h :: t -> if State.get_player_name h = name then true else name_check name t
 
+
 let plural count = if count > 1 then "s" else ""
 
 let one_turn state name card num =
@@ -111,6 +112,7 @@ let rec game_cycle (state : State.state) num =
         exit 0
   with Command.Unrecognized -> game_cycle state num
 
+
 let start_game num =
   let clearTerminal : unit = print_endline "\n" in
   let state = ready_state num in
@@ -128,6 +130,7 @@ let start_game num =
 (** printHand (State.get_player_list (deal_cards (initial_state num) num));
     print_endline "Request cards from a player by typing 'Request <player name>
     <card>'"; print_endline "Fire, let's get started!"*)
+    
 let rec play_game number_player =
   match number_player with
   | i when i < 3 ->

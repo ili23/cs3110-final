@@ -56,9 +56,7 @@ val count_cards : int -> player -> int
 val has_card : int -> player -> bool
 (** [has_card card player] returns if the player has a card of type card. *)
 
-val remove_top_card : int list -> int list
-(** [remove_top_card deck] removes the top card of a non-empty deck. If the deck
-    is empty, it raises exception NoCardsLeft*)
+val remove_cards_top : int -> int list -> int list
 
 val draw_from_pile : state -> player -> player
 (** [remove_top_card deck] removes the top card of a non-empty deck. If the deck
@@ -74,4 +72,11 @@ val exchange_cards : player -> player -> int -> state -> state
     type card are moved from the sender to the receiver *)
 
 val find_player : string -> player list -> player
+val get_deck : state -> int list
+val get_current_player_state : state -> int
 val assign_id : state -> int -> state
+val get_id : player -> int
+val next_turn : int -> state -> state
+
+exception NoPlayer
+
