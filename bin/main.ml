@@ -67,7 +67,6 @@ let rec name_check (name : string) player_list =
   | [] -> false
   | h :: t -> if State.get_player_name h = name then true else name_check name t
 
-
 let plural count = if count > 1 then "s" else ""
 
 let one_turn state name card num =
@@ -85,7 +84,7 @@ let one_turn state name card num =
     print_endline "Go Fish";
     let new_draw_player = State.draw_from_pile state current_player in
     let new_state = State.update_player state current_player new_draw_player in
-    let newest = State.next_turn new_state num in
+    let newest = State.next_turn num new_state in
     print_endline "drawn from pile";
     newest)
 
@@ -98,20 +97,24 @@ let rec game_cycle (state : State.state) num =
     | Command.Request (name, card) ->
         let players = State.get_player_list state in
         let current_player = State.get_current_player state in
-        if
-          name_check name players
-          && name <> State.get_player_name current_player
-        then
-          let new_state = one_turn state name card num in
-          game_cycle new_state num
+        if State.check_person current_player card then
+          if
+            name_check name players
+            && name <> State.get_player_name current_player
+          then
+            let new_state = one_turn state name card num in
+            game_cycle new_state num
+          else (
+            print_endline "Invalid name. Enter another command";
+            game_cycle state num)
         else (
-          print_endline "Invalid name. Enter another command";
+          print_endline
+            "You can only request cards you have. Enter another command";
           game_cycle state num)
     | Command.Quit ->
         print_endline "Farewell go fish-ers";
         exit 0
   with Command.Unrecognized -> game_cycle state num
-
 
 let start_game num =
   let clearTerminal : unit = print_endline "\n" in
@@ -130,7 +133,7 @@ let start_game num =
 (** printHand (State.get_player_list (deal_cards (initial_state num) num));
     print_endline "Request cards from a player by typing 'Request <player name>
     <card>'"; print_endline "Fire, let's get started!"*)
-    
+
 let rec play_game number_player =
   match number_player with
   | i when i < 3 ->

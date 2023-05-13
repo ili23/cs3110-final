@@ -19,10 +19,6 @@ val init_state : state
 val add_player : player -> state -> state
 (** [add_player st pl] adds player pl to state st. *)
 
-val next_turn : state -> int -> state
-(** [next_turn st turn] is the state with the current turn rotated to the next
-    person. *)
-
 val check_person : player -> int -> bool
 (** [check_person pl c] checks if player pl has card c in their hand. *)
 
@@ -56,7 +52,7 @@ val count_cards : int -> player -> int
 val has_card : int -> player -> bool
 (** [has_card card player] returns if the player has a card of type card. *)
 
-val remove_cards_top : int -> int list -> int list
+val remove_card_top : int -> int list -> int list
 
 val draw_from_pile : state -> player -> player
 (** [remove_top_card deck] removes the top card of a non-empty deck. If the deck
@@ -79,4 +75,3 @@ val get_id : player -> int
 val next_turn : int -> state -> state
 
 exception NoPlayer
-
