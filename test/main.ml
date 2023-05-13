@@ -38,17 +38,32 @@ let test_deck deck =
   in
   is_full deck && is_standard deck 1 0
 
+(** [pp_player player] pretty prints a player's name. *)
+let pp_player player = State.get_player_name player
+
 (****************************************************************************
   Testing state.ml functions
   ***************************************************************************)
 (*Initializing players and games to be used in testing*)
+
 let empty_game = State.init_state
 let player0 = State.init_player "Hog Rider"
 let player1 = State.init_player "Musketeer"
 let player2 = State.init_player "Goblin"
 let player3 = State.init_player "Dragon"
 
+let full_game =
+  State.add_player player0 empty_game
+  |> State.add_player player1 |> State.add_player player2
+  |> State.add_player player3
+
 (** Testing functions that set up the game*)
+let find_player_test name exp_out input =
+  name >:: fun _ ->
+  assert_equal exp_out
+    (State.assign_id full_game 0
+    |> State.get_player_list |> State.find_player input |> State.get_id)
+
 let initialization_tests =
   [
     ( "Checking that initialize game has 0 players" >:: fun _ ->
@@ -78,6 +93,22 @@ let initialization_tests =
       assert_equal "Goblin" (State.get_player_name player2) );
     ( "Checking that player 3 is initialized correctly" >:: fun _ ->
       assert_equal "Dragon" (State.get_player_name player3) );
+    ( "Checking that assigning id doesn't change player list" >:: fun _ ->
+      assert_equal "[Hog Rider; Musketeer; Goblin; Dragon]"
+        (State.assign_id full_game 0
+        |> State.get_player_list |> pp_list pp_player) );
+    find_player_test "Checking player 0 has correct id after assignment" 0
+      "Hog Rider";
+    find_player_test "Checking player 1 has correct id after assignment" 1
+      "Musketeer";
+    find_player_test "Checking player 2 has correct id after assignment" 2
+      "Goblin";
+    find_player_test "Checking player 3 has correct id after assignment" 3
+      "Dragon";
+    ( "Checking that find non existent player raises exception" >:: fun _ ->
+      assert_raises State.NoPlayer (fun () ->
+          State.assign_id full_game 0
+          |> State.get_player_list |> State.find_player "Bruh") );
   ]
 
 (** still need to test assign_id, next_turn*)

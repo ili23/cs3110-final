@@ -1,3 +1,6 @@
+(****************************************************************************
+  Types for data structures in states.
+  ***************************************************************************)
 type player = {
   name : string;
   ready : bool;
@@ -13,11 +16,17 @@ type state = {
   current_player : int;
 }
 
+(****************************************************************************
+  Exceptions needed for states.
+  ***************************************************************************)
 exception Filler
 exception Temporary
 exception NoCardsLeft
 exception NoPlayer
 
+(****************************************************************************
+  Helper functions for general state funtions.
+  ***************************************************************************)
 let gen_rand_int bound =
   Random.self_init ();
   Random.int bound
@@ -89,11 +98,13 @@ let shuffle =
   done;
   Array.to_list d
 
+(****************************************************************************
+  Functions that create/set/change states.
+  ***************************************************************************)
 let init_player name =
   { name; ready = false; id = -1; hand = []; score = 0; won_cards = [] }
 
 let init_state = { deck = shuffle; players = []; current_player = 0 }
-let get_player_name player = player.name
 
 let add_player player game_state =
   { game_state with players = game_state.players @ [ player ] }
@@ -101,13 +112,34 @@ let add_player player game_state =
 let rec assign_id_rec num p_list : player list =
   match p_list with
   | [] -> p_list
-  | h :: t -> assign_id_rec (num + 1) ({ h with id = num } :: t)
+  | h :: t -> { h with id = num } :: assign_id_rec (num + 1) t
 
 let assign_id game_state num =
   { game_state with players = assign_id_rec num game_state.players }
 
 let next_turn game_state num =
   { game_state with current_player = (game_state.current_player + 1) mod num }
+
+(****************************************************************************
+  Functions that get information about states.
+  ***************************************************************************)
+let get_deck state = state.deck
+let get_current_player_state state = state.current_player
+let get_id player = player.id
+
+let get_current_player state =
+  let rec get_turn id player_lst =
+    match player_lst with
+    | [] -> raise NoPlayer
+    | h :: t -> if h.id = id then h else get_turn id t
+  in
+  get_turn state.current_player state.players
+
+let get_player_name player = player.name
+
+(****************************************************************************
+  Other functions related to states.
+  ***************************************************************************)
 
 let rec check_hand hand (card : int) =
   match hand with
@@ -131,7 +163,7 @@ let rec remove_cards num deck =
 
 let drawFromPile game player =
   match game.deck with
-  | [] -> player
+  | [] -> raise NoCardsLeft
   | h :: t -> { player with hand = h :: player.hand }
 
 (*The following functions are used to transfer cards from one player to
@@ -179,13 +211,6 @@ let rec check_quad_helper lst prev cnt acc =
       else if h = prev then check_quad_helper t prev (cnt + 1) acc
       else check_quad_helper t h 1 acc
 
-let rec get_turn id player_lst =
-  match player_lst with
-  | [] -> raise NoPlayer
-  | h :: t -> if h.id = id then h else get_turn id t
-
-let get_current_player state = get_turn state.current_player state.players
-
 (** will return [] if no quads, otherwise will return nonempty list*)
 let check_quad player = check_quad_helper player.hand 0 0 []
 
@@ -211,6 +236,3 @@ let rec find_player name player_list =
   match player_list with
   | [] -> raise NoPlayer
   | h :: t -> if h.name = name then h else find_player name t
-
-let get_deck state = state.deck
-let get_current_player_state state = state.current_player

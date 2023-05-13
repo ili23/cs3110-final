@@ -61,3 +61,7 @@ val exchange_cards : player -> player -> int -> state -> state
 val find_player : string -> player list -> player
 val get_deck : state -> int list
 val get_current_player_state : state -> int
+val assign_id : state -> int -> state
+val get_id : player -> int
+
+exception NoPlayer
