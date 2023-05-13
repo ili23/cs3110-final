@@ -63,5 +63,6 @@ val get_deck : state -> int list
 val get_current_player_state : state -> int
 val assign_id : state -> int -> state
 val get_id : player -> int
+val next_turn : int -> state -> state
 
 exception NoPlayer

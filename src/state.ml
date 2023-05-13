@@ -117,7 +117,7 @@ let rec assign_id_rec num p_list : player list =
 let assign_id game_state num =
   { game_state with players = assign_id_rec num game_state.players }
 
-let next_turn game_state num =
+let next_turn num game_state =
   { game_state with current_player = (game_state.current_player + 1) mod num }
 
 (****************************************************************************
@@ -130,7 +130,7 @@ let get_id player = player.id
 let get_current_player state =
   let rec get_turn id player_lst =
     match player_lst with
-    | [] -> raise NoPlayer
+    | [] -> raise NoPlayer (*Impossible*)
     | h :: t -> if h.id = id then h else get_turn id t
   in
   get_turn state.current_player state.players

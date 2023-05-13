@@ -58,13 +58,14 @@ let full_game =
   |> State.add_player player3
 
 (** Testing functions that set up the game*)
-let find_player_test name exp_out input =
-  name >:: fun _ ->
-  assert_equal exp_out
-    (State.assign_id full_game 0
-    |> State.get_player_list |> State.find_player input |> State.get_id)
 
 let initialization_tests =
+  let find_player_test name exp_out input =
+    name >:: fun _ ->
+    assert_equal exp_out
+      (State.assign_id full_game 0
+      |> State.get_player_list |> State.find_player input |> State.get_id)
+  in
   [
     ( "Checking that initialize game has 0 players" >:: fun _ ->
       assert_equal [] (State.get_player_list empty_game) );
@@ -109,12 +110,44 @@ let initialization_tests =
       assert_raises State.NoPlayer (fun () ->
           State.assign_id full_game 0
           |> State.get_player_list |> State.find_player "Bruh") );
+    ( "Checking that adding players doesn't change initial turn" >:: fun _ ->
+      assert_equal 0
+        (State.get_current_player_state (State.assign_id full_game 0)) );
   ]
 
-(** still need to test assign_id, next_turn*)
+(** Testing functions that move the game along*)
+let game_tests =
+  [
+    ( "Checking next turn functionalities, 1 step" >:: fun _ ->
+      assert_equal 1
+        (State.get_current_player_state (State.next_turn 4 full_game)) );
+    ( "Checking next turn functionalities, 2 step" >:: fun _ ->
+      assert_equal 2
+        (State.get_current_player_state
+           (State.next_turn 4 full_game |> State.next_turn 4)) );
+    ( "Checking next turn functionalities, 3 step" >:: fun _ ->
+      assert_equal 3
+        (State.get_current_player_state
+           (State.next_turn 4 full_game
+           |> State.next_turn 4 |> State.next_turn 4)) );
+    ( "Checking next turn functionalities, 4 step, back to the starting player"
+    >:: fun _ ->
+      assert_equal 0
+        (State.get_current_player_state
+           (State.next_turn 4 full_game
+           |> State.next_turn 4 |> State.next_turn 4 |> State.next_turn 4)) );
+    ( "Checking next turn functionalities, 5 step" >:: fun _ ->
+      assert_equal 1
+        (State.get_current_player_state
+           (State.next_turn 4 full_game
+           |> State.next_turn 4 |> State.next_turn 4 |> State.next_turn 4
+           |> State.next_turn 4)) );
+  ]
 
 (****************************************************************************
   Running the full test suite
   ***************************************************************************)
-let suite = "test suite for A2" >::: List.flatten [ initialization_tests ]
+let suite =
+  "test suite for A2" >::: List.flatten [ initialization_tests; game_tests ]
+
 let _ = run_test_tt_main suite
