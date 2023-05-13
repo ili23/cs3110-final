@@ -89,32 +89,36 @@ let one_turn state name card num =
     newest)
 
 let rec game_cycle (state : State.state) num =
-  let _ = print_endline "\n \n \n" in
-  let _ = print_hand [ State.get_current_player state ] in
-  let _ = print_endline "\n \n \n" in
-  try
-    match parse_command state with
-    | Command.Request (name, card) ->
-        let players = State.get_player_list state in
-        let current_player = State.get_current_player state in
-        if State.check_person current_player card then
-          if
-            name_check name players
-            && name <> State.get_player_name current_player
-          then
-            let new_state = one_turn state name card num in
-            game_cycle new_state num
+  if State.check_deck state then
+    let _ = print_endline "\n \n \n" in
+    let _ = print_hand [ State.get_current_player state ] in
+    let _ = print_endline "\n \n \n" in
+    try
+      match parse_command state with
+      | Command.Request (name, card) ->
+          let players = State.get_player_list state in
+          let current_player = State.get_current_player state in
+          if State.check_person current_player card then
+            if
+              name_check name players
+              && name <> State.get_player_name current_player
+            then
+              let new_state = one_turn state name card num in
+              game_cycle new_state num
+            else (
+              print_endline "Invalid name. Enter another command";
+              game_cycle state num)
           else (
-            print_endline "Invalid name. Enter another command";
+            print_endline
+              "You can only request cards you have. Enter another command";
             game_cycle state num)
-        else (
-          print_endline
-            "You can only request cards you have. Enter another command";
-          game_cycle state num)
-    | Command.Quit ->
-        print_endline "Farewell go fish-ers";
-        exit 0
-  with Command.Unrecognized -> game_cycle state num
+      | Command.Quit ->
+          print_endline "Farewell go fish-ers";
+          exit 0
+    with Command.Unrecognized -> game_cycle state num
+  else (
+    print_endline "No more cards left in the deck. The game is over";
+    exit 0)
 
 let start_game num =
   let clearTerminal : unit = print_endline "\n" in
