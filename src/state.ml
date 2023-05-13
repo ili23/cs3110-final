@@ -162,7 +162,7 @@ let rec remove_card_top num deck =
   | 0 -> deck
   | x -> remove_card_top (x - 1) (remove_top_card_help deck)
 
-let drawFromPile game player =
+let draw_from_pile game player =
   match game.deck with
   | [] -> raise NoCardsLeft
   | h :: t -> { player with hand = h :: player.hand }
