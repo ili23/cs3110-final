@@ -101,16 +101,18 @@ let check_person player card = check_hand player.hand card
 let add_card player card =
   { player with hand = List.sort compare (card :: player.hand) }
 
-let remove_top_card_help deck =
-  match deck with
-  | [] -> raise NoCardsLeft
-  | h :: t -> t
-
 (** Used to remove num top cards in deck.*)
-let rec remove_cards_top num deck =
-  match num with
-  | 0 -> deck
-  | x -> remove_cards_top (x - 1) (remove_top_card_help deck)
+let remove_card_top num state =
+  let rec remove_top num dk =
+    match num with
+    | 0 -> dk
+    | x -> (
+        match dk with
+        | [] -> raise NoCardsLeft
+        | h :: t -> remove_top (x - 1) t)
+  in
+  let new_deck = remove_top num state.deck in
+  { state with deck = new_deck }
 
 let draw_from_pile game player =
   match game.deck with

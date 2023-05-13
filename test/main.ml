@@ -144,7 +144,9 @@ let game_tests =
 (****************************************************************************
   Testing command.ml functions
   ***************************************************************************)
-let command_tests = []
+let command_tests =
+  [ (* ( "Testing parsing of string into Quit" >:: fun _ -> Command.Quit
+       (Command.parse "Quit") ); *) ]
 
 (****************************************************************************
   Running the full test suite
