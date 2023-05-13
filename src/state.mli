@@ -19,12 +19,19 @@ val init_state : state
 val add_player : player -> state -> state
 (** [add_player st pl] adds player pl to state st. *)
 
+val next_turn : state -> int -> state
+(** [next_turn st turn] is the state with the current turn rotated to the next
+    person. *)
+
 val check_person : player -> int -> bool
 (** [check_person pl c] checks if player pl has card c in their hand. *)
 
 val initialize_players_hands : int list -> player list -> player list
 (** [initalize_players_hands pl deck] distributes five cards to each player in
     pl from the deck.*)
+
+val update_player : state -> player -> player -> state
+(** [update_player st pl new_pl] updates st with new_pl replacing pl*)
 
 val update_players : state -> player list -> state
 (** [update_players st pl] updates st with the updated pl*)
@@ -42,10 +49,20 @@ val get_player_list : state -> player list
 val shuffle : int list
 (** [shuffle] is a randomly shuffled deck of cards*)
 
+val count_cards : int -> player -> int
+(** [count_cards card player] returns the number of cards of type card the
+    player has. *)
+
 val has_card : int -> player -> bool
 (** [has_card card player] returns if the player has a card of type card. *)
 
 val remove_cards_top : int -> int list -> int list
+
+val draw_from_pile : state -> player -> player
+(** [remove_top_card deck] removes the top card of a non-empty deck. If the deck
+    is empty, it raises exception NoCardsLeft*)
+
+val remove_cards : int -> int list -> int list
 (** [remove_cards num deck] removes the top num cards from the deck. *)
 
 val get_current_player : state -> player
@@ -62,3 +79,4 @@ val get_id : player -> int
 val next_turn : int -> state -> state
 
 exception NoPlayer
+

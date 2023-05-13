@@ -32,62 +32,12 @@ let gen_rand_int bound =
   Random.int bound
 
 let shuffle =
-  let d =
-    [|
-      1;
-      1;
-      1;
-      1;
-      2;
-      2;
-      2;
-      2;
-      3;
-      3;
-      3;
-      3;
-      4;
-      4;
-      4;
-      4;
-      5;
-      5;
-      5;
-      5;
-      6;
-      6;
-      6;
-      6;
-      7;
-      7;
-      7;
-      7;
-      8;
-      8;
-      8;
-      8;
-      9;
-      9;
-      9;
-      9;
-      10;
-      10;
-      10;
-      10;
-      11;
-      11;
-      11;
-      11;
-      12;
-      12;
-      12;
-      12;
-      13;
-      13;
-      13;
-      13;
-    |]
-  in
+  let d = Array.make 52 1 in
+  for x = 1 to 13 do
+    for y = 0 to 3 do
+      Array.set d ((4 * (x - 1)) + y) x
+    done
+  done;
   for x = 0 to 100 do
     let x_1 = gen_rand_int 52 in
     let x_2 = gen_rand_int 52 in
@@ -109,13 +59,13 @@ let init_state = { deck = shuffle; players = []; current_player = 0 }
 let add_player player game_state =
   { game_state with players = game_state.players @ [ player ] }
 
-let rec assign_id_rec num p_list : player list =
+let rec assign_id_rec index p_list : player list =
   match p_list with
   | [] -> p_list
   | h :: t -> { h with id = num } :: assign_id_rec (num + 1) t
 
 let assign_id game_state num =
-  { game_state with players = assign_id_rec num game_state.players }
+  { game_state with players = assign_id_rec 0 game_state.players }
 
 let next_turn num game_state =
   { game_state with current_player = (game_state.current_player + 1) mod num }
@@ -162,7 +112,7 @@ let rec remove_card_top num deck =
   | 0 -> deck
   | x -> remove_card_top (x - 1) (remove_top_card_help deck)
 
-let drawFromPile game player =
+let draw_from_pile game player =
   match game.deck with
   | [] -> raise NoCardsLeft
   | h :: t -> { player with hand = h :: player.hand }
