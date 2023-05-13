@@ -62,7 +62,7 @@ let add_player player game_state =
 let rec assign_id_rec index p_list : player list =
   match p_list with
   | [] -> p_list
-  | h :: t -> { h with id = num } :: assign_id_rec (num + 1) t
+  | h :: t -> { h with id = index } :: assign_id_rec (index + 1) t
 
 let assign_id game_state num =
   { game_state with players = assign_id_rec 0 game_state.players }
