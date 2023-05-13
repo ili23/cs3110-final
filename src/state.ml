@@ -107,10 +107,10 @@ let remove_top_card_help deck =
   | h :: t -> t
 
 (** Used to remove num top cards in deck.*)
-let rec remove_card_top num deck =
+let rec remove_cards_top num deck =
   match num with
   | 0 -> deck
-  | x -> remove_card_top (x - 1) (remove_top_card_help deck)
+  | x -> remove_cards_top (x - 1) (remove_top_card_help deck)
 
 let draw_from_pile game player =
   match game.deck with

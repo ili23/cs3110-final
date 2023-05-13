@@ -142,10 +142,15 @@ let game_tests =
   ]
 
 (****************************************************************************
+  Testing command.ml functions
+  ***************************************************************************)
+let command_tests = []
+
+(****************************************************************************
   Running the full test suite
   ***************************************************************************)
 let suite =
   "Test Suite for State Functions"
-  >::: List.flatten [ initialization_tests; game_tests ]
+  >::: List.flatten [ initialization_tests; game_tests; command_tests ]
 
 let _ = run_test_tt_main suite
