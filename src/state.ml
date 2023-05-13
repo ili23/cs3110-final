@@ -171,13 +171,13 @@ let exchange_cards receiver sender card game =
   let new_receiver = repeat_add_card receiver card count in
   update_player send_state receiver new_receiver
 
-let rec check_quad_helper lst prev cnt =
+let rec check_quad_helper lst prev cnt acc =
   match List.sort compare lst with
-  | [] -> if cnt = 4 then Some prev else None
+  | [] -> if cnt = 4 then prev :: acc else acc
   | h :: t ->
-      if cnt = 4 then Some prev
-      else if h = prev then check_quad_helper t prev (cnt + 1)
-      else check_quad_helper t h 1
+      if cnt = 4 then check_quad_helper t h 1 (prev :: acc)
+      else if h = prev then check_quad_helper t prev (cnt + 1) acc
+      else check_quad_helper t h 1 acc
 
 let rec get_turn id player_lst =
   match player_lst with
@@ -185,7 +185,9 @@ let rec get_turn id player_lst =
   | h :: t -> if h.id = id then h else get_turn id t
 
 let get_current_player state = get_turn state.current_player state.players
-let check_quad player = check_quad_helper player.hand 0 0
+
+(** will return [] if no quads, otherwise will return nonempty list*)
+let check_quad player = check_quad_helper player.hand 0 0 []
 
 (* let initialize_deck = let deck : int list = [] in for i = 1 to 13 do for j =
    1 to 4 do deck @ [ i ]; print_int (List.length deck) done done *)
@@ -209,3 +211,6 @@ let rec find_player name player_list =
   match player_list with
   | [] -> raise NoPlayer
   | h :: t -> if h.name = name then h else find_player name t
+
+let get_deck state = state.deck
+let get_current_player_state state = state.current_player
