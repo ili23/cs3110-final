@@ -1,25 +1,9 @@
 open OUnit2
 open Game
-
 (****************************************************************************
   Helper functions to pretty print and test various data structures needed in
   testing.
   ***************************************************************************)
-
-(** [pp_list pp_elt lst] pretty-prints list [lst], using [pp_elt] to
-    pretty-print each element of [lst]. Source: A2 Test Suite*)
-let pp_list pp_elt lst =
-  let pp_elts lst =
-    let rec loop n acc = function
-      | [] -> acc
-      | [ h ] -> acc ^ pp_elt h
-      | h1 :: (h2 :: t as t') ->
-          if n = 100 then acc ^ "..." (* stop printing long list *)
-          else loop (n + 1) (acc ^ pp_elt h1 ^ "; ") t'
-    in
-    loop 0 "" lst
-  in
-  "[" ^ pp_elts lst ^ "]"
 
 (** [test_deck lst] checks that an initialized deck lst has 52 cards that follow
     the standard deck breakdown*)
@@ -38,6 +22,29 @@ let test_deck deck =
 (** [pp_player player] pretty prints a player's name. *)
 let pp_player player = State.get_player_name player
 
+(** [pp_list pp_elt lst] pretty-prints list [lst], using [pp_elt] to
+    pretty-print each element of [lst]. Source: A2 Test Suite*)
+let pp_list pp_elt lst =
+  let pp_elts lst =
+    let rec loop n acc = function
+      | [] -> acc
+      | [ h ] -> acc ^ pp_elt h
+      | h1 :: (h2 :: t as t') ->
+          if n = 100 then acc ^ "..." (* stop printing long list *)
+          else loop (n + 1) (acc ^ pp_elt h1 ^ "; ") t'
+    in
+    loop 0 "" lst
+  in
+  "[" ^ pp_elts lst ^ "]"
+
+(** [print_hand player] pretty prints a player's hands. *)
+let print_hand player = State.get_player_hand player
+
+let rec print_all_hands pl_list acc =
+  match pl_list with
+  | [] -> acc
+  | h :: t -> print_all_hands t (print_hand h :: acc)
+
 (****************************************************************************
   Testing state.ml functions
   ***************************************************************************)
@@ -54,8 +61,19 @@ let full_game =
   |> State.add_player player1 |> State.add_player player2
   |> State.add_player player3
 
-(** Testing functions that set up the game*)
+let pseudo_game0 = State.set_deck full_game [ 1; 2; 3; 4 ]
+let pseudo_game1 = State.set_deck full_game [ 1 ]
+let pseudo_game2 = State.set_deck full_game []
+let player0_with_cards = State.add_card (State.repeat_add_card player0 1 2) 3
+let player1_with_cards = State.add_card (State.repeat_add_card player1 4 2) 3
 
+let exchange_game =
+  let game_with_new_0 =
+    State.update_player full_game player0 player0_with_cards
+  in
+  State.update_player game_with_new_0 player1 player1_with_cards
+
+(** Testing functions that set up the game*)
 let initialization_tests =
   let find_player_test name exp_out input =
     name >:: fun _ ->
@@ -112,6 +130,55 @@ let initialization_tests =
         (State.get_current_player_state (State.assign_id full_game 0)) );
   ]
 
+let deck1 =
+  let d = Array.make 52 1 in
+  for x = 1 to 13 do
+    for y = 0 to 3 do
+      Array.set d ((4 * (x - 1)) + y) x
+    done
+  done;
+  Array.to_list d
+
+let deck2 =
+  let rec create_deck acc num =
+    match num with
+    | 0 -> acc
+    | x -> create_deck (x :: acc) (x - 1)
+  in
+  let thirteen = create_deck [] 13 in
+  thirteen @ thirteen @ thirteen @ thirteen
+
+let game_with_deck1 = State.set_deck full_game deck1
+let game_with_deck2 = State.set_deck full_game deck2
+
+let initialize_hand_test =
+  [
+    ( "Initialize game1" >:: fun _ ->
+      assert_equal
+        [
+          [ 4; 5; 5; 5; 5 ];
+          [ 3; 3; 4; 4; 4 ];
+          [ 2; 2; 2; 3; 3 ];
+          [ 1; 1; 1; 1; 2 ];
+        ]
+        (print_all_hands
+           (State.initialize_players_hands deck1
+              (State.get_player_list game_with_deck1))
+           []) );
+    ( "Initialize game2" >:: fun _ ->
+      assert_equal
+        [
+          [ 3; 4; 5; 6; 7 ];
+          [ 1; 2; 11; 12; 13 ];
+          [ 6; 7; 8; 9; 10 ];
+          [ 1; 2; 3; 4; 5 ];
+        ]
+        (print_all_hands
+           (State.initialize_players_hands deck2
+              (State.get_player_list game_with_deck2))
+           []) );
+  ]
+
 (** Testing functions that move the game along*)
 let game_tests =
   [
@@ -139,20 +206,195 @@ let game_tests =
            (State.next_turn 4 full_game
            |> State.next_turn 4 |> State.next_turn 4 |> State.next_turn 4
            |> State.next_turn 4)) );
+    ( "Checking that current player with id is matched to correct player"
+    >:: fun _ ->
+      assert_equal "Hog Rider"
+        (pp_player (State.assign_id full_game 0 |> State.get_current_player)) );
+    ( "Current player with id is matched to correct player after next turn"
+    >:: fun _ ->
+      assert_equal "Musketeer"
+        (pp_player
+           (State.assign_id full_game 0
+           |> State.next_turn 4 |> State.get_current_player)) );
+  ]
+
+let exchange_tests =
+  [
+    ( "Exchange one card test for sender" >:: fun _ ->
+      assert_equal [ 1; 1; 3; 3 ]
+        (State.find_player "Hog Rider"
+           (State.exchange_cards player0_with_cards player1_with_cards 3
+              exchange_game
+           |> State.get_player_list)
+        |> print_hand) );
+    ( "Exchange one card test for receiver" >:: fun _ ->
+      assert_equal [ 4; 4 ]
+        (State.find_player "Musketeer"
+           (State.exchange_cards player0_with_cards player1_with_cards 3
+              exchange_game
+           |> State.get_player_list)
+        |> print_hand) );
+    ( "Exchange two card sender" >:: fun _ ->
+      assert_equal [ 1; 1; 3; 4; 4 ]
+        (State.find_player "Hog Rider"
+           (State.exchange_cards player0_with_cards player1_with_cards 4
+              exchange_game
+           |> State.get_player_list)
+        |> print_hand) );
+    ( "Exchange two card sender" >:: fun _ ->
+      assert_equal [ 3 ]
+        (State.find_player "Musketeer"
+           (State.exchange_cards player0_with_cards player1_with_cards 4
+              exchange_game
+           |> State.get_player_list)
+        |> print_hand) );
+  ]
+
+(****************************************************************************
+  Testing functions that don't directly manipulate state but are used to in
+  state.ml.
+  ***************************************************************************)
+let other_functions =
+  [
+    ( "Check if card is in an empty hand" >:: fun _ ->
+      assert_equal false (State.check_hand [] 0) );
+    ( "Card is first card in hand" >:: fun _ ->
+      assert_equal true (State.check_hand [ 0; 1; 2; 3; 4 ] 0) );
+    ( "Card is middle card in hand" >:: fun _ ->
+      assert_equal true (State.check_hand [ 1; 2; 0; 1 ] 0) );
+    ( "Card is last card in hand" >:: fun _ ->
+      assert_equal true (State.check_hand [ 0; 1; 2; 3; 4 ] 4) );
+    ( "Not in hand" >:: fun _ ->
+      assert_equal false (State.check_hand [ 0; 1; 2; 3; 4 ] 5) );
+    ( "Check if deck is nonempty with nonempty deck" >:: fun _ ->
+      assert_equal true (State.check_deck full_game) );
+    ( "Check if deck is nonempty with nonempty deck " >:: fun _ ->
+      assert_equal false (State.remove_card_top 52 full_game |> State.check_deck)
+    );
+    ( "Add one card to player's hand" >:: fun _ ->
+      assert_equal [ 1 ] (print_hand (State.add_card player0 1)) );
+    ( "Add two card to player's hand in sorted order" >:: fun _ ->
+      assert_equal [ 1; 2 ]
+        (print_hand (State.add_card (State.add_card player0 1) 2)) );
+    ( "Add two card to player's hand not sorted order" >:: fun _ ->
+      assert_equal [ 0; 1 ]
+        (print_hand (State.add_card (State.add_card player0 1) 0)) );
+    ( "Remove 0 cards from full deck" >:: fun _ ->
+      assert_equal 52
+        (List.length (State.remove_card_top 0 full_game |> State.get_deck)) );
+    ( "Remove 10 cards from full deck" >:: fun _ ->
+      assert_equal 42
+        (List.length (State.remove_card_top 10 full_game |> State.get_deck)) );
+    ( "Remove all cards from full deck" >:: fun _ ->
+      assert_equal 0
+        (List.length (State.remove_card_top 52 full_game |> State.get_deck)) );
+    ( "Remove more cards than there are in deck" >:: fun _ ->
+      assert_raises State.NoCardsLeft (fun () ->
+          State.remove_card_top 53 full_game |> State.get_deck) );
+    ( "Deal one card from deck" >:: fun _ ->
+      assert_equal [ 1 ]
+        (State.draw_from_pile pseudo_game0 player0 |> print_hand) );
+    ( "Deal all cards from deck" >:: fun _ ->
+      assert_equal [ 1 ]
+        (State.draw_from_pile pseudo_game1 player0 |> print_hand) );
+    ( "Deal cards from empty deck" >:: fun _ ->
+      assert_raises State.NoCardsLeft (fun () ->
+          State.draw_from_pile pseudo_game2 player3) );
+    ( "Check quads in empty hand" >:: fun _ ->
+      assert_equal [] (State.check_quad player0) );
+    ( "Check quads in nonempty hand with no quads" >:: fun _ ->
+      assert_equal []
+        (State.add_card (State.add_card player0 1) 1 |> State.check_quad) );
+    ( "Check quads in nonempty hand with one set of quads" >:: fun _ ->
+      assert_equal [ 4 ] (State.repeat_add_card player0 4 4 |> State.check_quad)
+    );
+    ( "Check quads in nonempty hand with two set of quads" >:: fun _ ->
+      assert_equal [ 4; 5 ]
+        (State.repeat_add_card (State.repeat_add_card player0 4 4) 5 4
+        |> State.check_quad) );
   ]
 
 (****************************************************************************
   Testing command.ml functions
   ***************************************************************************)
 let command_tests =
-  [ (* ( "Testing parsing of string into Quit" >:: fun _ -> Command.Quit
-       (Command.parse "Quit") ); *) ]
+  [
+    ( "Testing expected quit string" >:: fun _ ->
+      assert_equal Command.Quit (Command.parse "quit") );
+    ( "Testing random capitalization" >:: fun _ ->
+      assert_equal Command.Quit (Command.parse "QUiT") );
+    ( "Testing extra spaces in quit" >:: fun _ ->
+      assert_equal Command.Quit (Command.parse " Quit  ") );
+    ( "Testing bad quit input" >:: fun _ ->
+      assert_raises Command.Unrecognized (fun () -> Command.parse "qu it") );
+    ( "Testing normal request input" >:: fun _ ->
+      assert_equal
+        (Command.Request ("iram", 5))
+        (Command.parse "request iram 5") );
+    ( "Testing normal request input capitalization changes" >:: fun _ ->
+      assert_equal
+        (Command.Request ("joe", 51))
+        (Command.parse "REQUEST joe 51") );
+    ( "Testing empty" >:: fun _ ->
+      assert_raises Command.Empty (fun () -> Command.parse "") );
+    ( "Testing request with no other inputs" >:: fun _ ->
+      assert_raises Command.Unrecognized (fun () -> Command.parse "request") );
+    ( "Testing unrecognized" >:: fun _ ->
+      assert_raises Command.Unrecognized (fun () -> Command.parse "BADINPUTS")
+    );
+    ( "Drawing multiple cards at once" >:: fun _ ->
+      assert_equal [ 1; 1; 1 ] (State.repeat_add_card player0 1 3 |> print_hand)
+    );
+    ( "Drawing 0 doesn't change hand" >:: fun _ ->
+      assert_equal [] (State.repeat_add_card player0 1 0 |> print_hand) );
+    ( "Count cards where one card is in hand" >:: fun _ ->
+      assert_equal 1 (State.add_card player0 1 |> State.count_cards 1) );
+    ( "Count cards where multiple card is in hand" >:: fun _ ->
+      assert_equal 5 (State.repeat_add_card player0 1 5 |> State.count_cards 1)
+    );
+    ( "Count cards where no card is in hand" >:: fun _ ->
+      assert_equal 0 (State.repeat_add_card player0 1 0 |> State.count_cards 1)
+    );
+    ( "Count cards where mix of card is in hand" >:: fun _ ->
+      assert_equal 5
+        (State.repeat_add_card (State.repeat_add_card player0 3 2) 1 5
+        |> State.count_cards 1) );
+    ( "Check if player has card in empty hand" >:: fun _ ->
+      assert_equal false (State.repeat_add_card player0 1 0 |> State.has_card 1)
+    );
+    ( "Card not in hand" >:: fun _ ->
+      assert_equal false (State.repeat_add_card player0 2 1 |> State.has_card 1)
+    );
+    ( "Card in hand" >:: fun _ ->
+      assert_equal true (State.repeat_add_card player0 2 1 |> State.has_card 2)
+    );
+    ( "Adding and then deleting leads to empty hand" >:: fun _ ->
+      assert_equal []
+        (State.repeat_add_card player0 2 1 |> State.delete_cards 2 |> print_hand)
+    );
+    ( "deleting some cards from hand" >:: fun _ ->
+      assert_equal [ 1; 1; 1; 1; 1 ]
+        (State.repeat_add_card (State.repeat_add_card player0 3 2) 1 5
+        |> State.delete_cards 3 |> print_hand) );
+    ( "deleting non-existent cards in hand" >:: fun _ ->
+      assert_equal [ 2 ]
+        (State.repeat_add_card player0 2 1 |> State.delete_cards 5 |> print_hand)
+    );
+  ]
 
 (****************************************************************************
   Running the full test suite
   ***************************************************************************)
 let suite =
   "Test Suite for State Functions"
-  >::: List.flatten [ initialization_tests; game_tests; command_tests ]
+  >::: List.flatten
+         [
+           initialization_tests;
+           initialize_hand_test;
+           game_tests;
+           other_functions;
+           command_tests;
+           exchange_tests;
+         ]
 
 let _ = run_test_tt_main suite

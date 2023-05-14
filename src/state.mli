@@ -71,6 +71,12 @@ val assign_id : state -> int -> state
 val get_id : player -> int
 val next_turn : int -> state -> state
 val check_deck : state -> bool
+val check_hand : int list -> int -> bool
+val add_card : player -> int -> player
+val set_deck : state -> int list -> state
+val repeat_add_card : player -> int -> int -> player
+val delete_cards : int -> player -> player
+val check_quad : player -> int list
 
 exception NoPlayer
 exception NoCardsLeft
