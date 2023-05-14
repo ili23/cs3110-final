@@ -8,7 +8,8 @@ exception Unrecognized
 exception Empty
 
 let rec parse_helper str =
-  let split = String.split_on_char ' ' str in
+  let lower = String.lowercase_ascii str in
+  let split = String.split_on_char ' ' lower in
   let filtered = List.filter (fun item -> item <> "") split in
   match filtered with
   | [] -> raise Empty
@@ -18,3 +19,4 @@ let rec parse_helper str =
   | _ -> raise Unrecognized
 
 let parse str = parse_helper str
+let x = Quit

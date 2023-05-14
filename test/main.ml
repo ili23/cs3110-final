@@ -1,25 +1,9 @@
 open OUnit2
 open Game
-
 (****************************************************************************
   Helper functions to pretty print and test various data structures needed in
   testing.
   ***************************************************************************)
-
-(** [pp_list pp_elt lst] pretty-prints list [lst], using [pp_elt] to
-    pretty-print each element of [lst]. Source: A2 Test Suite*)
-let pp_list pp_elt lst =
-  let pp_elts lst =
-    let rec loop n acc = function
-      | [] -> acc
-      | [ h ] -> acc ^ pp_elt h
-      | h1 :: (h2 :: t as t') ->
-          if n = 100 then acc ^ "..." (* stop printing long list *)
-          else loop (n + 1) (acc ^ pp_elt h1 ^ "; ") t'
-    in
-    loop 0 "" lst
-  in
-  "[" ^ pp_elts lst ^ "]"
 
 (** [test_deck lst] checks that an initialized deck lst has 52 cards that follow
     the standard deck breakdown*)
@@ -37,6 +21,21 @@ let test_deck deck =
 
 (** [pp_player player] pretty prints a player's name. *)
 let pp_player player = State.get_player_name player
+
+(** [pp_list pp_elt lst] pretty-prints list [lst], using [pp_elt] to
+    pretty-print each element of [lst]. Source: A2 Test Suite*)
+let pp_list pp_elt lst =
+  let pp_elts lst =
+    let rec loop n acc = function
+      | [] -> acc
+      | [ h ] -> acc ^ pp_elt h
+      | h1 :: (h2 :: t as t') ->
+          if n = 100 then acc ^ "..." (* stop printing long list *)
+          else loop (n + 1) (acc ^ pp_elt h1 ^ "; ") t'
+    in
+    loop 0 "" lst
+  in
+  "[" ^ pp_elts lst ^ "]"
 
 (****************************************************************************
   Testing state.ml functions
@@ -145,8 +144,31 @@ let game_tests =
   Testing command.ml functions
   ***************************************************************************)
 let command_tests =
-  [ (* ( "Testing parsing of string into Quit" >:: fun _ -> Command.Quit
-       (Command.parse "Quit") ); *) ]
+  [
+    ( "Testing expected quit string" >:: fun _ ->
+      assert_equal Command.Quit (Command.parse "quit") );
+    ( "Testing random capitalization" >:: fun _ ->
+      assert_equal Command.Quit (Command.parse "QUiT") );
+    ( "Testing extra spaces in quit" >:: fun _ ->
+      assert_equal Command.Quit (Command.parse " Quit  ") );
+    ( "Testing bad quit input" >:: fun _ ->
+      assert_raises Command.Unrecognized (fun () -> Command.parse "qu it") );
+    ( "Testing normal request input" >:: fun _ ->
+      assert_equal
+        (Command.Request ("iram", 5))
+        (Command.parse "request iram 5") );
+    ( "Testing normal request input capitalization changes" >:: fun _ ->
+      assert_equal
+        (Command.Request ("joe", 51))
+        (Command.parse "REQUEST joe 51") );
+    ( "Testing empty" >:: fun _ ->
+      assert_raises Command.Empty (fun () -> Command.parse "") );
+    ( "Testing request with no other inputs" >:: fun _ ->
+      assert_raises Command.Unrecognized (fun () -> Command.parse "request") );
+    ( "Testing unrecognized" >:: fun _ ->
+      assert_raises Command.Unrecognized (fun () -> Command.parse "BADINPUTS")
+    );
+  ]
 
 (****************************************************************************
   Running the full test suite
