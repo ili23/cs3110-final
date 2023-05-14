@@ -39,6 +39,12 @@ let pp_list pp_elt lst =
 
 (** [print_hand player] pretty prints a player's hands. *)
 let print_hand player = State.get_player_hand player
+
+let rec print_all_hands pl_list acc =
+  match pl_list with
+  | [] -> acc
+  | h :: t -> print_all_hands t (print_hand h :: acc)
+
 (****************************************************************************
   Testing state.ml functions
   ***************************************************************************)
@@ -122,6 +128,55 @@ let initialization_tests =
     ( "Checking that adding players doesn't change initial turn" >:: fun _ ->
       assert_equal 0
         (State.get_current_player_state (State.assign_id full_game 0)) );
+  ]
+
+let deck1 =
+  let d = Array.make 52 1 in
+  for x = 1 to 13 do
+    for y = 0 to 3 do
+      Array.set d ((4 * (x - 1)) + y) x
+    done
+  done;
+  Array.to_list d
+
+let deck2 =
+  let rec create_deck acc num =
+    match num with
+    | 0 -> acc
+    | x -> create_deck (x :: acc) (x - 1)
+  in
+  let thirteen = create_deck [] 13 in
+  thirteen @ thirteen @ thirteen @ thirteen
+
+let game_with_deck1 = State.set_deck full_game deck1
+let game_with_deck2 = State.set_deck full_game deck2
+
+let initialize_hand_test =
+  [
+    ( "Initialize game1" >:: fun _ ->
+      assert_equal
+        [
+          [ 4; 5; 5; 5; 5 ];
+          [ 3; 3; 4; 4; 4 ];
+          [ 2; 2; 2; 3; 3 ];
+          [ 1; 1; 1; 1; 2 ];
+        ]
+        (print_all_hands
+           (State.initialize_players_hands deck1
+              (State.get_player_list game_with_deck1))
+           []) );
+    ( "Initialize game2" >:: fun _ ->
+      assert_equal
+        [
+          [ 3; 4; 5; 6; 7 ];
+          [ 1; 2; 11; 12; 13 ];
+          [ 6; 7; 8; 9; 10 ];
+          [ 1; 2; 3; 4; 5 ];
+        ]
+        (print_all_hands
+           (State.initialize_players_hands deck2
+              (State.get_player_list game_with_deck2))
+           []) );
   ]
 
 (** Testing functions that move the game along*)
@@ -333,6 +388,13 @@ let command_tests =
 let suite =
   "Test Suite for State Functions"
   >::: List.flatten
-         [ initialization_tests; game_tests; other_functions; command_tests ]
+         [
+           initialization_tests;
+           initialize_hand_test;
+           game_tests;
+           other_functions;
+           command_tests;
+           exchange_tests;
+         ]
 
 let _ = run_test_tt_main suite
