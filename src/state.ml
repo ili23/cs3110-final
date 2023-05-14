@@ -127,7 +127,6 @@ let draw_from_pile game player =
   | [] -> raise NoCardsLeft
   | h :: t -> { player with hand = h :: player.hand }
 
-(*Up to this part*)
 let rec repeat_add_card player card = function
   | 0 -> player
   | x -> repeat_add_card (add_card player card) card (x - 1)
@@ -171,10 +170,7 @@ let rec check_quad_helper lst prev cnt acc =
       else check_quad_helper t h 1 acc
 
 (** will return [] if no quads, otherwise will return nonempty list*)
-let check_quad player = check_quad_helper player.hand 0 0 []
-
-(* let initialize_deck = let deck : int list = [] in for i = 1 to 13 do for j =
-   1 to 4 do deck @ [ i ]; print_int (List.length deck) done done *)
+let check_quad player = List.sort compare (check_quad_helper player.hand 0 0 [])
 
 let rec initialize_players_hands deck players =
   match players with

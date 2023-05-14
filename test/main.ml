@@ -205,6 +205,18 @@ let other_functions =
     ( "Deal cards from empty deck" >:: fun _ ->
       assert_raises State.NoCardsLeft (fun () ->
           State.draw_from_pile pseudo_game2 player3) );
+    ( "Check quads in empty hand" >:: fun _ ->
+      assert_equal [] (State.check_quad player0) );
+    ( "Check quads in nonempty hand with no quads" >:: fun _ ->
+      assert_equal []
+        (State.add_card (State.add_card player0 1) 1 |> State.check_quad) );
+    ( "Check quads in nonempty hand with one set of quads" >:: fun _ ->
+      assert_equal [ 4 ] (State.repeat_add_card player0 4 4 |> State.check_quad)
+    );
+    ( "Check quads in nonempty hand with two set of quads" >:: fun _ ->
+      assert_equal [ 4; 5 ]
+        (State.repeat_add_card (State.repeat_add_card player0 4 4) 5 4
+        |> State.check_quad) );
   ]
 
 (****************************************************************************
@@ -240,6 +252,39 @@ let command_tests =
     );
     ( "Drawing 0 doesn't change hand" >:: fun _ ->
       assert_equal [] (State.repeat_add_card player0 1 0 |> print_hand) );
+    ( "Count cards where one card is in hand" >:: fun _ ->
+      assert_equal 1 (State.add_card player0 1 |> State.count_cards 1) );
+    ( "Count cards where multiple card is in hand" >:: fun _ ->
+      assert_equal 5 (State.repeat_add_card player0 1 5 |> State.count_cards 1)
+    );
+    ( "Count cards where no card is in hand" >:: fun _ ->
+      assert_equal 0 (State.repeat_add_card player0 1 0 |> State.count_cards 1)
+    );
+    ( "Count cards where mix of card is in hand" >:: fun _ ->
+      assert_equal 5
+        (State.repeat_add_card (State.repeat_add_card player0 3 2) 1 5
+        |> State.count_cards 1) );
+    ( "Check if player has card in empty hand" >:: fun _ ->
+      assert_equal false (State.repeat_add_card player0 1 0 |> State.has_card 1)
+    );
+    ( "Card not in hand" >:: fun _ ->
+      assert_equal false (State.repeat_add_card player0 2 1 |> State.has_card 1)
+    );
+    ( "Card in hand" >:: fun _ ->
+      assert_equal true (State.repeat_add_card player0 2 1 |> State.has_card 2)
+    );
+    ( "Adding and then deleting leads to empty hand" >:: fun _ ->
+      assert_equal []
+        (State.repeat_add_card player0 2 1 |> State.delete_cards 2 |> print_hand)
+    );
+    ( "deleting some cards from hand" >:: fun _ ->
+      assert_equal [ 1; 1; 1; 1; 1 ]
+        (State.repeat_add_card (State.repeat_add_card player0 3 2) 1 5
+        |> State.delete_cards 3 |> print_hand) );
+    ( "deleting non-existent cards in hand" >:: fun _ ->
+      assert_equal [ 2 ]
+        (State.repeat_add_card player0 2 1 |> State.delete_cards 5 |> print_hand)
+    );
   ]
 
 (****************************************************************************
