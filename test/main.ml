@@ -148,6 +148,15 @@ let deck2 =
   let thirteen = create_deck [] 13 in
   thirteen @ thirteen @ thirteen @ thirteen
 
+let incomplete_deck =
+  let rec create_deck acc num =
+    match num with
+    | 0 -> acc
+    | x -> create_deck (x :: acc) (x - 1)
+  in
+  let deck = create_deck [] 13 in
+  deck
+
 let game_with_deck1 = State.set_deck full_game deck1
 let game_with_deck2 = State.set_deck full_game deck2
 
@@ -177,6 +186,10 @@ let initialize_hand_test =
            (State.initialize_players_hands deck2
               (State.get_player_list game_with_deck2))
            []) );
+    ( "Raises exception on incomplete deck" >:: fun _ ->
+      assert_raises State.Temporary (fun () ->
+          State.initialize_players_hands incomplete_deck
+            (State.get_player_list game_with_deck2)) );
   ]
 
 (** Testing functions that move the game along*)

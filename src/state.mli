@@ -80,3 +80,4 @@ val check_quad : player -> int list
 
 exception NoPlayer
 exception NoCardsLeft
+exception Temporary
