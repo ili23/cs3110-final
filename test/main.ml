@@ -22,6 +22,9 @@ let test_deck deck =
 (** [pp_player player] pretty prints a player's name. *)
 let pp_player player = State.get_player_name player
 
+(** [print_hand player] prints a player's hands. *)
+let print_hand player = State.get_player_hand player
+
 (** [pp_list pp_elt lst] pretty-prints list [lst], using [pp_elt] to
     pretty-print each element of [lst]. Source: A2 Test Suite*)
 let pp_list pp_elt lst =
@@ -138,6 +141,59 @@ let game_tests =
            (State.next_turn 4 full_game
            |> State.next_turn 4 |> State.next_turn 4 |> State.next_turn 4
            |> State.next_turn 4)) );
+    ( "Checking that current player with id is matched to correct player"
+    >:: fun _ ->
+      assert_equal "Hog Rider"
+        (pp_player (State.assign_id full_game 0 |> State.get_current_player)) );
+    ( "Current player with id is matched to correct player after next turn"
+    >:: fun _ ->
+      assert_equal "Musketeer"
+        (pp_player
+           (State.assign_id full_game 0
+           |> State.next_turn 4 |> State.get_current_player)) );
+  ]
+
+(****************************************************************************
+  Testing functions that don't directly manipulate state but are used to in
+  state.ml.
+  ***************************************************************************)
+let other_functions =
+  [
+    ( "Check if card is in an empty hand" >:: fun _ ->
+      assert_equal false (State.check_hand [] 0) );
+    ( "Card is first card in hand" >:: fun _ ->
+      assert_equal true (State.check_hand [ 0; 1; 2; 3; 4 ] 0) );
+    ( "Card is middle card in hand" >:: fun _ ->
+      assert_equal true (State.check_hand [ 1; 2; 0; 1 ] 0) );
+    ( "Card is last card in hand" >:: fun _ ->
+      assert_equal true (State.check_hand [ 0; 1; 2; 3; 4 ] 4) );
+    ( "Not in hand" >:: fun _ ->
+      assert_equal false (State.check_hand [ 0; 1; 2; 3; 4 ] 5) );
+    ( "Check if deck is nonempty with nonempty deck" >:: fun _ ->
+      assert_equal true (State.check_deck full_game) );
+    ( "Check if deck is nonempty with nonempty deck " >:: fun _ ->
+      assert_equal false (State.remove_card_top 52 full_game |> State.check_deck)
+    );
+    ( "Add one card to player's hand" >:: fun _ ->
+      assert_equal [ 1 ] (print_hand (State.add_card player0 1)) );
+    ( "Add two card to player's hand in sorted order" >:: fun _ ->
+      assert_equal [ 1; 2 ]
+        (print_hand (State.add_card (State.add_card player0 1) 2)) );
+    ( "Add two card to player's hand not sorted order" >:: fun _ ->
+      assert_equal [ 0; 1 ]
+        (print_hand (State.add_card (State.add_card player0 1) 0)) );
+    ( "Remove 0 cards from full deck" >:: fun _ ->
+      assert_equal 52
+        (List.length (State.remove_card_top 0 full_game |> State.get_deck)) );
+    ( "Remove 10 cards from full deck" >:: fun _ ->
+      assert_equal 42
+        (List.length (State.remove_card_top 10 full_game |> State.get_deck)) );
+    ( "Remove all cards from full deck" >:: fun _ ->
+      assert_equal 0
+        (List.length (State.remove_card_top 52 full_game |> State.get_deck)) );
+    ( "Remove more cards than there are in deck" >:: fun _ ->
+      assert_raises State.NoCardsLeft (fun () ->
+          State.remove_card_top 53 full_game |> State.get_deck) );
   ]
 
 (****************************************************************************
@@ -175,6 +231,7 @@ let command_tests =
   ***************************************************************************)
 let suite =
   "Test Suite for State Functions"
-  >::: List.flatten [ initialization_tests; game_tests; command_tests ]
+  >::: List.flatten
+         [ initialization_tests; game_tests; other_functions; command_tests ]
 
 let _ = run_test_tt_main suite
