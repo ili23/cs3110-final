@@ -33,9 +33,8 @@ clean:
 	dune clean
 	rm -f finalproject.zip
 
-# potentially need to add this stuff although if we dont make any compilation units, we prolly don't need this 
-# doc:
-# 	dune build @doc
+doc:
+	dune build @doc
 
-# opendoc: doc
-# 	@bash opendoc.sh
+opendoc: doc
+	@bash opendoc.sh
