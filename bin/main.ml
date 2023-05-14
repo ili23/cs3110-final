@@ -1,5 +1,11 @@
 open Game
 
+let rec concat_newlines x acc =
+  match x with
+  | 0 -> acc
+  | x -> concat_newlines (x - 1) "\n" ^ acc
+
+let scrollTerminal = print_string (concat_newlines 23 "")
 let remove_empty x = String.length x > 0
 
 let rec int_list_to_string lst =
@@ -123,10 +129,10 @@ let rec game_cycle (state : State.state) num =
 let start_game num =
   let clearTerminal : unit = print_endline "\n" in
   let state = ready_state num in
-  print_string "Welcome ";
+  print_string "Ready to begin?";
   print_players (State.get_player_list state);
   print_endline "\n";
-  print_endline "Here are some hints before you begin:";
+  print_endline "Here are some commands for you to use before you begin:";
   print_endline
     "Type card requests in the format 'Request <player name> <card>'";
   print_endline "Type 'quit' to quit the game";
@@ -152,7 +158,16 @@ let rec play_game number_player =
 
 (** [main ()] prompts for the game to play, then starts it. *)
 let main () =
-  ANSITerminal.print_string [ ANSITerminal.blue ] "\n\n Welcome to Go Fish.\n";
+  scrollTerminal;
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    "\n\nWelcome to Big Bactrian's Camel's Implementation of Go Fish.\n";
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    "Here are some rules/tips to ensure the best experience: \n\n\
+    \    Since the game is meant to be played on one device with each player \
+     passing the device around, there will be some honor code built in. Don't \
+     scroll through the terminal during your turn to look at other people's \
+     hands. \n\
+    \ ";
   print_endline
     "Please enter the number of players for the game. (Enter an integer less \
      than 10)\n";

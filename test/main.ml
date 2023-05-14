@@ -58,6 +58,14 @@ let full_game =
 let pseudo_game0 = State.set_deck full_game [ 1; 2; 3; 4 ]
 let pseudo_game1 = State.set_deck full_game [ 1 ]
 let pseudo_game2 = State.set_deck full_game []
+let player0_with_cards = State.add_card (State.repeat_add_card player0 1 2) 3
+let player1_with_cards = State.add_card (State.repeat_add_card player1 4 2) 3
+
+let exchange_game =
+  let game_with_new_0 =
+    State.update_player full_game player0 player0_with_cards
+  in
+  State.update_player game_with_new_0 player1 player1_with_cards
 
 (** Testing functions that set up the game*)
 let initialization_tests =
@@ -153,6 +161,38 @@ let game_tests =
         (pp_player
            (State.assign_id full_game 0
            |> State.next_turn 4 |> State.get_current_player)) );
+  ]
+
+let exchange_tests =
+  [
+    ( "Exchange one card test for sender" >:: fun _ ->
+      assert_equal [ 1; 1; 3; 3 ]
+        (State.find_player "Hog Rider"
+           (State.exchange_cards player0_with_cards player1_with_cards 3
+              exchange_game
+           |> State.get_player_list)
+        |> print_hand) );
+    ( "Exchange one card test for receiver" >:: fun _ ->
+      assert_equal [ 4; 4 ]
+        (State.find_player "Musketeer"
+           (State.exchange_cards player0_with_cards player1_with_cards 3
+              exchange_game
+           |> State.get_player_list)
+        |> print_hand) );
+    ( "Exchange two card sender" >:: fun _ ->
+      assert_equal [ 1; 1; 3; 4; 4 ]
+        (State.find_player "Hog Rider"
+           (State.exchange_cards player0_with_cards player1_with_cards 4
+              exchange_game
+           |> State.get_player_list)
+        |> print_hand) );
+    ( "Exchange two card sender" >:: fun _ ->
+      assert_equal [ 3 ]
+        (State.find_player "Musketeer"
+           (State.exchange_cards player0_with_cards player1_with_cards 4
+              exchange_game
+           |> State.get_player_list)
+        |> print_hand) );
   ]
 
 (****************************************************************************
