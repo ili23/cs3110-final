@@ -73,6 +73,8 @@ val next_turn : int -> state -> state
 val check_deck : state -> bool
 val check_hand : int list -> int -> bool
 val add_card : player -> int -> player
+val set_deck : state -> int list -> state
+val repeat_add_card : player -> int -> int -> player
 
 exception NoPlayer
 exception NoCardsLeft

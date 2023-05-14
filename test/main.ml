@@ -22,9 +22,6 @@ let test_deck deck =
 (** [pp_player player] pretty prints a player's name. *)
 let pp_player player = State.get_player_name player
 
-(** [print_hand player] prints a player's hands. *)
-let print_hand player = State.get_player_hand player
-
 (** [pp_list pp_elt lst] pretty-prints list [lst], using [pp_elt] to
     pretty-print each element of [lst]. Source: A2 Test Suite*)
 let pp_list pp_elt lst =
@@ -40,6 +37,8 @@ let pp_list pp_elt lst =
   in
   "[" ^ pp_elts lst ^ "]"
 
+(** [print_hand player] pretty prints a player's hands. *)
+let print_hand player = State.get_player_hand player
 (****************************************************************************
   Testing state.ml functions
   ***************************************************************************)
@@ -56,8 +55,11 @@ let full_game =
   |> State.add_player player1 |> State.add_player player2
   |> State.add_player player3
 
-(** Testing functions that set up the game*)
+let pseudo_game0 = State.set_deck full_game [ 1; 2; 3; 4 ]
+let pseudo_game1 = State.set_deck full_game [ 1 ]
+let pseudo_game2 = State.set_deck full_game []
 
+(** Testing functions that set up the game*)
 let initialization_tests =
   let find_player_test name exp_out input =
     name >:: fun _ ->
@@ -194,6 +196,15 @@ let other_functions =
     ( "Remove more cards than there are in deck" >:: fun _ ->
       assert_raises State.NoCardsLeft (fun () ->
           State.remove_card_top 53 full_game |> State.get_deck) );
+    ( "Deal one card from deck" >:: fun _ ->
+      assert_equal [ 1 ]
+        (State.draw_from_pile pseudo_game0 player0 |> print_hand) );
+    ( "Deal all cards from deck" >:: fun _ ->
+      assert_equal [ 1 ]
+        (State.draw_from_pile pseudo_game1 player0 |> print_hand) );
+    ( "Deal cards from empty deck" >:: fun _ ->
+      assert_raises State.NoCardsLeft (fun () ->
+          State.draw_from_pile pseudo_game2 player3) );
   ]
 
 (****************************************************************************
@@ -224,6 +235,11 @@ let command_tests =
     ( "Testing unrecognized" >:: fun _ ->
       assert_raises Command.Unrecognized (fun () -> Command.parse "BADINPUTS")
     );
+    ( "Drawing multiple cards at once" >:: fun _ ->
+      assert_equal [ 1; 1; 1 ] (State.repeat_add_card player0 1 3 |> print_hand)
+    );
+    ( "Drawing 0 doesn't change hand" >:: fun _ ->
+      assert_equal [] (State.repeat_add_card player0 1 0 |> print_hand) );
   ]
 
 (****************************************************************************

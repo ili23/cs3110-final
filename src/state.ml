@@ -119,27 +119,20 @@ let remove_card_top num state =
   let new_deck = remove_top num state.deck in
   { state with deck = new_deck }
 
+(** Only used for testing purposes*)
+let set_deck st dk = { st with deck = dk }
+
 let draw_from_pile game player =
   match game.deck with
   | [] -> raise NoCardsLeft
   | h :: t -> { player with hand = h :: player.hand }
 
-(*The following functions are used to transfer cards from one player to
-  another*)
-let count_cards card player =
-  List.length (List.filter (fun x -> x = card) player.hand)
-
-let has_card card player = count_cards card player > 0
-
-let delete_cards card player =
-  { player with hand = List.filter (fun x -> x <> card) player.hand }
-
+(*Up to this part*)
 let rec repeat_add_card player card = function
   | 0 -> player
   | x -> repeat_add_card (add_card player card) card (x - 1)
 
 (*Need to call this each time we update player hands*)
-
 let rec update_player_list player_list player new_player =
   match player_list with
   | [] -> []
@@ -153,6 +146,14 @@ let rec update_player game player new_player =
 let update_players game p_list = { game with players = p_list }
 let get_player_list game = game.players
 let get_player_hand player = List.sort compare player.hand
+
+let count_cards card player =
+  List.length (List.filter (fun x -> x = card) player.hand)
+
+let has_card card player = count_cards card player > 0
+
+let delete_cards card player =
+  { player with hand = List.filter (fun x -> x <> card) player.hand }
 
 let exchange_cards receiver sender card game =
   let count = count_cards card sender in
