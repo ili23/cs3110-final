@@ -89,14 +89,30 @@ let one_turn state name card num =
     print_endline
       (string_of_int count ^ " " ^ string_of_int card ^ plural count
      ^ " received from " ^ name);
-    new_state)
+    let curr_player = State.get_current_player new_state in
+    if List.length (State.check_quad curr_player) > 0 then (
+      let newest_state =
+        State.update_player new_state curr_player (State.add_quad curr_player)
+      in
+      print_endline ("Congrats you collected all 4 " ^ string_of_int card ^ "s");
+      print_endline
+        ("Your new score is: "
+        ^ string_of_int
+            (State.get_score (State.get_current_player newest_state)));
+      newest_state)
+    else new_state)
   else (
     print_endline "Go Fish";
     let new_draw_player = State.draw_from_pile state current_player in
-    let new_state = State.update_player state current_player new_draw_player in
+    print_endline
+      ("You drew a "
+      ^ string_of_int (State.check_top_card state)
+      ^ " from the deck!");
+    let new_deck_state = State.remove_card_top 1 state in
+    let new_state =
+      State.update_player new_deck_state current_player new_draw_player
+    in
     let newest = State.next_turn num new_state in
-    print_endline "drawn from pile";
-    print_string scrollTerminal;
     newest)
 
 let rec game_cycle (state : State.state) num =
