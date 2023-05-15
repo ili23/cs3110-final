@@ -208,9 +208,19 @@ let one_turn state name card num =
     shift_ready newest num input)
 
 let rec print_winner lst =
-  match lst with
-  | [] -> ""
-  | h :: t -> h ^ ", " ^ print_winner t
+  let rec concat_winner list =
+    match list with
+    | [] -> ""
+    | h :: t -> h ^ ", " ^ concat_winner t
+  in
+  match List.length lst with
+  | 4 -> "Congrats on finishing the game! Everyone tied!"
+  | 3 | 2 ->
+      "Congrats on finishing the game! The winners are " ^ concat_winner lst
+      ^ "."
+  | 1 ->
+      "Congrats on finishing the game! The winner is " ^ concat_winner lst ^ "."
+  | _ -> "No winners!"
 
 let rec game_cycle (state : State.state) num =
   if State.check_deck state then
@@ -245,22 +255,22 @@ let rec game_cycle (state : State.state) num =
           exit 0
     with Command.Unrecognized -> game_cycle state num
   else (
-    print_endline "No more cards left in the deck. The game is over";
-    print_string "The winner is: ";
-    print_endline (State.check_winner state |> String.concat " ");
+    print_endline
+      "There are no more cards left in the deck which means the game is over";
+    print_endline (State.check_winner state |> print_winner);
     exit 0)
 
 let rec move_next state num input =
   match input with
   | i when String.lowercase_ascii i = "ready" -> game_cycle state num
   | i when String.lowercase_ascii i = "quit" ->
-      print_endline "Farewell Go Fish-ers ";
+      ANSITerminal.print_string [ ANSITerminal.blue ] "Farewell Go Fish-ers \n";
       exit 0
   | i ->
-      print_endline
+      ANSITerminal.print_string [ ANSITerminal.blue ]
         "Not recognized, if you are ready to see your cards, enter 'ready' \
          without spaces or extra characters or if you want to quit, enter \
-         'quit' \n";
+         'quit' \n\n";
       print_string ">> ";
       let new_input = read_line () in
       move_next state num new_input
@@ -268,19 +278,23 @@ let rec move_next state num input =
 let start_game num =
   let state = ready_state num in
   print_string scrollTerminal;
-  print_string "Here we go! The players will go in this order: ";
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    "Here we go! The players will go in this order: ";
   print_players (State.get_player_list state);
   print_endline ".\n";
-  print_endline
-    "As a reminder, here are some commands for you to use during the game:";
-  print_endline
-    "Type card requests in the format 'Request <player name> <card>'";
-  print_endline "Type 'quit' to quit the game";
-  print_endline "Fire, let's get started!";
-  print_endline
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    "As a reminder, here are some commands for you to use during the game: \n";
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    "Type card requests in the format 'Request <player name> <card>' \n ";
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    "Type 'quit' to quit the game \n";
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    "Fire, let's get started!\n\n\n\n";
+  ANSITerminal.print_string [ ANSITerminal.blue ]
     "Are you ready to see your cards? Make sure that the other players can't \
      see your cards. If you are ready, type 'ready'. As per usual, type 'quit' \
-     to leave the game. ";
+     to leave the game. \n";
+  print_string ">> ";
   let input = read_line () in
   move_next state num input
 
@@ -296,9 +310,9 @@ let rec play_game input =
         "Farewell Go Fish-ers. See you soon!";
       exit 0
   | i ->
-      print_endline
+      ANSITerminal.print_string [ ANSITerminal.blue ]
         "Not recognized, if you want to play the game, enter 'ready' without \
-         spaces or extra characters or if you want to quit, enter 'quit' \n";
+         spaces or extra characters or if you want to quit, enter 'quit' \n\n";
       print_string ">> ";
       let new_input = read_line () in
       play_game new_input
