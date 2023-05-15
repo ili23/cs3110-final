@@ -1,8 +1,8 @@
 open OUnit2
-(** Test plan: Our game involved two components, the backend (src/state.ml &
-    src/command.ml) where we update and change game states and process commands
-    and a frontend terminal (bin/main.ml) where users can enter their commands.
-    For the backend, we decided it was best to create a test suite with both
+(** Test plan: Our game involved two components, the backend modules (State &
+    Command) where we update and change game states and process commands and a
+    frontend terminal (bin/main.ml) where users can enter their commands. For
+    the backend, we decided it was best to create a OUnit test suite with both
     black/glass box tests to ensure correctness. This combination ensures that
     our code will output the expected results and glassbox testing allows us to
     breakdown our implementation and check every possible pattern match/if-else
