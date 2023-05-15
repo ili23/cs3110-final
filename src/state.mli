@@ -11,6 +11,7 @@ type state
 (** The abstract type of values representing a game state. *)
 
 type player_and_score
+(** Record type representing a player and their score. *)
 
 val init_player : string -> player
 (** [init_player a] creates a player with the name a. *)

@@ -22,7 +22,8 @@ let initialize_name i =
   ANSITerminal.print_string [ ANSITerminal.blue ]
     ("Please enter the name of player "
     ^ string_of_int (i + 1)
-    ^ " (must be a string)\n");
+    ^ " (try to keep the name to under 8 characters so that it will be easier \
+       to request cards.)\n");
   print_string ">> ";
   let words = String.split_on_char ' ' (read_line ()) in
   let full_words = List.filter remove_empty words in
@@ -72,7 +73,7 @@ let rec print_hand p_list =
   | [] -> ()
   | h :: t ->
       ANSITerminal.print_string [ ANSITerminal.blue ]
-        ("Your hand is: " ^ cards_to_string (State.get_player_hand h) ^ "\n.");
+        ("Your hand is: " ^ cards_to_string (State.get_player_hand h) ^ "\n");
       print_hand t
 
 let rec print_players p_list =
@@ -82,7 +83,8 @@ let rec print_players p_list =
       ANSITerminal.print_string [ ANSITerminal.blue ]
         ("and " ^ State.get_player_name h)
   | h :: t ->
-      print_string (State.get_player_name h ^ ", ");
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        (State.get_player_name h ^ ", ");
       print_players t
 
 let parse_command state =
@@ -133,7 +135,7 @@ let rec print_names p_list =
 
 let rec print_spaces num =
   match num with
-  | 0 -> print_string " "
+  | 0 -> print_string ""
   | _ ->
       print_string " ";
       print_spaces (num - 1)
@@ -144,15 +146,20 @@ let rec print_scores p_list =
   | h :: t ->
       ANSITerminal.print_string [ ANSITerminal.blue ]
         (string_of_int (State.get_score h));
-      print_spaces (String.length (State.get_player_name h) - 2);
+      print_spaces (String.length (State.get_player_name h) - 1);
       print_string "     ";
       print_scores t
 
 let rec shift_ready state num input =
   match input with
   | i when String.lowercase_ascii i = "ready" ->
+      let _ =
+        ANSITerminal.print_string [ ANSITerminal.blue ] "\n Game Log: \n"
+      in
       let _ = print_log (List.rev (State.get_log state)) 10 in
-      let _ = print_endline "Scores: " in
+      let _ =
+        ANSITerminal.print_string [ ANSITerminal.blue ] "Scoreboard: \n"
+      in
       let _ = print_names (State.get_player_list state) in
       let _ = print_string "\n" in
       let _ = print_scores (State.get_player_list state) in
@@ -170,6 +177,29 @@ let rec shift_ready state num input =
       print_string ">> ";
       let new_input = read_line () in
       shift_ready state num new_input
+
+let rec done_viewing state num input =
+  match input with
+  | x when String.lowercase_ascii x = "done" ->
+      print_string scrollTerminal;
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "Are you ready to see your cards? Make sure that the other players \
+         can't see your cards. If you are ready, type 'ready'. As per usual, \
+         type 'quit' to leave the game. \n";
+      let input = read_line () in
+      shift_ready state num input
+  | x when x = "quit" ->
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "Thanks for playing! Farewell Go Fish-ers! \n";
+      exit 0
+  | x ->
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "Not recognized, if you are done viewing your cards, enter 'done' \
+         without spaces or extra characters or if you want to quit, enter \
+         'quit' \n\n";
+      print_string ">> ";
+      let new_input = read_line () in
+      done_viewing state num new_input
 
 let one_turn state name card num =
   let players = State.get_player_list state in
@@ -228,13 +258,13 @@ let one_turn state name card num =
       State.update_player new_deck_state current_player new_draw_player
     in
     let newest = State.next_turn num new_state in
-    print_string scrollTerminal;
     ANSITerminal.print_string [ ANSITerminal.blue ]
-      "Are you ready to see your cards? Make sure that the other players can't \
-       see your cards. If you are ready, type 'ready'. As per usual, type \
-       'quit' to leave the game. \n";
+      "Are you done with your turn? If you are ready to move to the next \
+       player, type 'done'. As per usual, type 'quit' to leave the game. \n";
+    print_string ">> ";
     let input = read_line () in
-    shift_ready newest num input)
+
+    done_viewing newest num input)
 
 let rec print_winner lst =
   let rec concat_winner list =
@@ -295,12 +325,18 @@ let rec game_cycle (state : State.state) num =
       "There are no more cards left in the deck which means the game is over. \n";
     ANSITerminal.print_string [ ANSITerminal.blue ]
       ((State.check_winner state |> print_winner) ^ "\n");
+    print_names (State.get_player_list state);
+    print_string "\n";
+    print_scores (State.get_player_list state);
     exit 0)
   else (
     ANSITerminal.print_string [ ANSITerminal.blue ]
       "A player is out of cards which means that the game is over.\n";
     ANSITerminal.print_string [ ANSITerminal.blue ]
       ((State.check_winner state |> print_winner) ^ "\n");
+    print_names (State.get_player_list state);
+    print_string "\n";
+    print_scores (State.get_player_list state);
     exit 0)
 
 let rec move_next state num input =
@@ -372,15 +408,18 @@ let main () =
      Honor code: Since the game is meant to be played on one device with each \
      player passing the device around, there will be some honor code built in. \
      Don't scroll through the terminal during your turn to look at other \
-     people's hands. This also means that you shouldn't change the terminal \
-     size. (Use the default MacOS terminal for the best experience.) \n\
+     people's hands. You can of course scroll if you need to look at the log, \
+     just don't purposely search for other people's hands. This also means \
+     that you shouldn't change the terminal size. (Use the default MacOS \
+     terminal for the best experience.) \n\
     \ ";
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "\n\
-     Now on how to play the game: Each player is initially dealt 5 cards. Each \
-     person gets a turn in the order they enter their name. Before each turn, \
-     the player whose turn it is will be asked to type in ready to make sure \
-     they are ready and are the only ones seeing their card. \n\n\
+     Now on how to play the game: This is meant to be a four player game. Each \
+     player is initially dealt 5 cards. Then, each person gets a turn in the \
+     order they enter their name. Before each turn, the player whose turn it \
+     is will be asked to type in ready to make sure they are ready and are the \
+     only ones seeing their card. \n\n\
      During a turn, a player can request a card from another player by typing \
      in 'Request <player name> <card>' or quit the game by typing in 'Quit'. \
      Players can only request for cards they already have in their hand. If \
