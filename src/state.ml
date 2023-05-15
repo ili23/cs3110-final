@@ -23,6 +23,7 @@ exception Filler
 exception Temporary
 exception NoCardsLeft
 exception NoPlayer
+exception Illegal
 
 (****************************************************************************
   Helper functions for general state funtions.
@@ -86,6 +87,8 @@ let get_current_player state =
   get_turn state.current_player state.players
 
 let get_player_name player = player.name
+let get_score player = player.score
+let get_won_cards player = player.won_cards
 
 (****************************************************************************
   Other functions related to states.
@@ -126,6 +129,11 @@ let draw_from_pile game player =
   match game.deck with
   | [] -> raise NoCardsLeft
   | h :: t -> { player with hand = h :: player.hand }
+
+let check_top_card game =
+  match game.deck with
+  | [] -> raise NoCardsLeft
+  | h :: t -> h
 
 let rec repeat_add_card player card = function
   | 0 -> player
@@ -171,6 +179,19 @@ let rec check_quad_helper lst prev cnt acc =
 
 (** will return [] if no quads, otherwise will return nonempty list*)
 let check_quad player = List.sort compare (check_quad_helper player.hand 0 0 [])
+
+let quad_finder player =
+  match check_quad player with
+  | [ h ] -> h
+  | _ -> raise Illegal
+
+let add_quad player =
+  let prev_score = player.score in
+  let won = check_quad player in
+  let card = quad_finder player in
+  let new_player = delete_cards card player in
+  let new_hand = new_player.hand in
+  { player with hand = new_hand; won_cards = won; score = prev_score + 1 }
 
 let rec initialize_players_hands deck players =
   match players with

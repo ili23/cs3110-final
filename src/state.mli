@@ -77,7 +77,12 @@ val set_deck : state -> int list -> state
 val repeat_add_card : player -> int -> int -> player
 val delete_cards : int -> player -> player
 val check_quad : player -> int list
+val add_quad : player -> player
+val get_score : player -> int
+val get_won_cards : player -> int list
+val check_top_card : state -> int
 
 exception NoPlayer
 exception NoCardsLeft
+exception Illegal
 exception Temporary
