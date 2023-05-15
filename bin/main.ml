@@ -79,6 +79,21 @@ let rec name_check (name : string) player_list =
 
 let plural count = if count > 1 then "s" else ""
 
+let rec shift state num input =
+  match input with
+  | i when String.lowercase_ascii i = "ready" -> state
+  | i when String.lowercase_ascii i = "quit" ->
+      print_endline "Farewell Go Fish-ers ";
+      exit 0
+  | i ->
+      print_endline
+        "Not recognized, if you are ready to see your cards, enter 'ready' \
+         without spaces or extra characters or if you want to quit, enter \
+         'quit' \n";
+      print_string ">> ";
+      let new_input = read_line () in
+      shift state num new_input
+
 let one_turn state name card num =
   let players = State.get_player_list state in
   let current_player = State.get_current_player state in
@@ -102,7 +117,7 @@ let one_turn state name card num =
       newest_state)
     else new_state)
   else (
-    print_endline "Go Fish";
+    print_endline "You guessed incorrectly! Go Fish!";
     let new_draw_player = State.draw_from_pile state current_player in
     print_endline
       ("You drew a "
@@ -113,7 +128,13 @@ let one_turn state name card num =
       State.update_player new_deck_state current_player new_draw_player
     in
     let newest = State.next_turn num new_state in
-    newest)
+    print_string scrollTerminal;
+    print_endline
+      "Are you ready to see your cards? Make sure that the other players can't \
+       see your cards. If you are ready, type 'ready'. As per usual, type \
+       'quit' to leave the game. ";
+    let input = read_line () in
+    shift newest num input)
 
 let rec game_cycle (state : State.state) num =
   if State.check_deck state then
