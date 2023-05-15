@@ -22,8 +22,8 @@ let initialize_name i =
   ANSITerminal.print_string [ ANSITerminal.blue ]
     ("Please enter the name of player "
     ^ string_of_int (i + 1)
-    ^ " (try to keep the name to under 8 characters so that it will be easier \
-       to request cards.)\n");
+    ^ " (You cannot leave this blank. Try to keep the name to under 8 \
+       characters so that it will be easier to request cards.)\n");
   print_string ">> ";
   let words = String.split_on_char ' ' (read_line ()) in
   let full_words = List.filter remove_empty words in
@@ -325,15 +325,23 @@ let rec game_cycle (state : State.state) num =
       "There are no more cards left in the deck which means the game is over. \n";
     ANSITerminal.print_string [ ANSITerminal.blue ]
       ((State.check_winner state |> print_winner) ^ "\n");
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      "The final scoreboard is: \n";
     print_names (State.get_player_list state);
     print_string "\n";
     print_scores (State.get_player_list state);
+    print_string "\n";
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      "Thanks for playing! Hope you enjoyed our game. For bugs/feedback please \
+       email il233@cornell.edu, jjx5@cornell.edu, or jl2748@cornell.edu. \n";
     exit 0)
   else (
     ANSITerminal.print_string [ ANSITerminal.blue ]
       "A player is out of cards which means that the game is over.\n";
     ANSITerminal.print_string [ ANSITerminal.blue ]
       ((State.check_winner state |> print_winner) ^ "\n");
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      "The final scoreboard is: \n";
     print_names (State.get_player_list state);
     print_string "\n";
     print_scores (State.get_player_list state);
