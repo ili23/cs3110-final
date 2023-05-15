@@ -97,7 +97,7 @@ let rec name_check (name : string) player_list =
 
 let plural count = if count > 1 then "s" else ""
 
-let rec shift state num input =
+let rec shift_ready state num input =
   match input with
   | i when String.lowercase_ascii i = "ready" -> state
   | i when String.lowercase_ascii i = "quit" ->
@@ -110,7 +110,7 @@ let rec shift state num input =
          'quit' \n";
       print_string ">> ";
       let new_input = read_line () in
-      shift state num new_input
+      shift_ready state num new_input
 
 let one_turn state name card num =
   let players = State.get_player_list state in
@@ -152,7 +152,12 @@ let one_turn state name card num =
        see your cards. If you are ready, type 'ready'. As per usual, type \
        'quit' to leave the game. ";
     let input = read_line () in
-    shift newest num input)
+    shift_ready newest num input)
+
+let rec print_winner lst =
+  match lst with
+  | [] -> ""
+  | h :: t -> h ^ ", " ^ print_winner t
 
 let rec game_cycle (state : State.state) num =
   if State.check_deck state then
@@ -189,6 +194,7 @@ let rec game_cycle (state : State.state) num =
     with Command.Unrecognized -> game_cycle state num
   else (
     print_endline "No more cards left in the deck. The game is over";
+    print_endline (State.check_winner state |> print_winner);
     exit 0)
 
 let rec move_next state num input =
