@@ -299,6 +299,20 @@ let game_tests =
         (pp_player
            (State.assign_id full_game 0
            |> State.next_turn 4 |> State.get_current_player)) );
+    ( "Current player with id is matched to correct player after two turns"
+    >:: fun _ ->
+      assert_equal "Goblin"
+        (pp_player
+           (State.assign_id full_game 0
+           |> State.next_turn 4 |> State.next_turn 4 |> State.get_current_player
+           )) );
+    ( "Current player with id is matched to correct player after three turns"
+    >:: fun _ ->
+      assert_equal "Dragon"
+        (pp_player
+           (State.assign_id full_game 0
+           |> State.next_turn 4 |> State.next_turn 4 |> State.next_turn 4
+           |> State.get_current_player)) );
     ( "Get winner at beginning of game" >:: fun _ ->
       assert_equal
         [ "Dragon"; "Goblin"; "Musketeer"; "Hog Rider" ]
