@@ -111,8 +111,16 @@ let vowel card =
   | 11 -> "an"
   | _ -> "a"
 
+let rec last_ten list =
+  match List.length list with
+  | i when i <= 10 -> list
+  | i -> (
+      match list with
+      | [] -> list
+      | h :: t -> last_ten t)
+
 let rec print_log list num =
-  match list with
+  match last_ten list with
   | [] -> print_endline ""
   | h :: t ->
       if num > 0 then (
@@ -156,7 +164,7 @@ let rec shift_ready state num input =
       let _ =
         ANSITerminal.print_string [ ANSITerminal.blue ] "\n Game Log: \n"
       in
-      let _ = print_log (List.rev (State.get_log state)) 10 in
+      let _ = print_log (State.get_log state) 10 in
       let _ =
         ANSITerminal.print_string [ ANSITerminal.blue ] "Scoreboard: \n"
       in
@@ -270,6 +278,7 @@ let rec print_winner lst =
   let rec concat_winner list =
     match list with
     | [] -> ""
+    | [ h ] -> h
     | h :: t -> h ^ ", " ^ concat_winner t
   in
   match List.length lst with
