@@ -151,6 +151,14 @@ let deck2 =
   let thirteen = create_deck [] 13 in
   thirteen @ thirteen @ thirteen @ thirteen
 
+let deck3 =
+  let rec create_deck acc num =
+    match num with
+    | 0 -> acc
+    | x -> create_deck (acc @ [ x ]) (x - 1)
+  in
+  create_deck [] 52
+
 let incomplete_deck =
   let rec create_deck acc num =
     match num with
@@ -162,6 +170,7 @@ let incomplete_deck =
 
 let game_with_deck1 = State.set_deck full_game deck1
 let game_with_deck2 = State.set_deck full_game deck2
+let game_with_deck3 = State.set_deck full_game deck3
 let player0_scored1 = State.set_score player0 1
 let player1_scored1 = State.set_score player1 2
 let player2_scored1 = State.set_score player2 3
@@ -234,6 +243,18 @@ let initialize_hand_test =
         (print_all_hands
            (State.initialize_players_hands deck2
               (State.get_player_list game_with_deck2))
+           []) );
+    ( "Initialize game3" >:: fun _ ->
+      assert_equal
+        [
+          [ 33; 34; 35; 36; 37 ];
+          [ 38; 39; 40; 41; 42 ];
+          [ 43; 44; 45; 46; 47 ];
+          [ 48; 49; 50; 51; 52 ];
+        ]
+        (print_all_hands
+           (State.initialize_players_hands deck3
+              (State.get_player_list game_with_deck3))
            []) );
     ( "Raises exception on incomplete deck" >:: fun _ ->
       assert_raises State.Temporary (fun () ->
@@ -377,6 +398,13 @@ let other_functions =
     ( "Remove 10 cards from full deck" >:: fun _ ->
       assert_equal 42
         (List.length (State.remove_card_top 10 full_game |> State.get_deck)) );
+    ( "Remove 45 cards from full deck" >:: fun _ ->
+      assert_equal
+        [ 12; 12; 12; 13; 13; 13; 13 ]
+        (State.remove_card_top 45 game_with_deck1 |> State.get_deck) );
+    ( "Remove 50 cards from full deck" >:: fun _ ->
+      assert_equal [ 12; 13 ]
+        (State.remove_card_top 50 game_with_deck2 |> State.get_deck) );
     ( "Remove all cards from full deck" >:: fun _ ->
       assert_equal 0
         (List.length (State.remove_card_top 52 full_game |> State.get_deck)) );
@@ -404,38 +432,6 @@ let other_functions =
       assert_equal [ 4; 5 ]
         (State.repeat_add_card (State.repeat_add_card player0 4 4) 5 4
         |> State.check_quad) );
-  ]
-
-(****************************************************************************
-  Testing command.ml functions
-  ***************************************************************************)
-let command_tests =
-  [
-    ( "Testing expected quit string" >:: fun _ ->
-      assert_equal Command.Quit (Command.parse "quit") );
-    ( "Testing random capitalization" >:: fun _ ->
-      assert_equal Command.Quit (Command.parse "QUiT") );
-    ( "Testing extra spaces in quit" >:: fun _ ->
-      assert_equal Command.Quit (Command.parse " Quit  ") );
-    ( "Testing extra spaces in quit" >:: fun _ ->
-      assert_equal Command.Quit (Command.parse " QuIt  ") );
-    ( "Testing bad quit input" >:: fun _ ->
-      assert_raises Command.Unrecognized (fun () -> Command.parse "qu it") );
-    ( "Testing normal request input" >:: fun _ ->
-      assert_equal
-        (Command.Request ("iram", 5))
-        (Command.parse "request iram 5") );
-    ( "Testing normal request input capitalization changes" >:: fun _ ->
-      assert_equal
-        (Command.Request ("joe", 51))
-        (Command.parse "REQUEST joe 51") );
-    ( "Testing empty" >:: fun _ ->
-      assert_raises Command.Empty (fun () -> Command.parse "") );
-    ( "Testing request with no other inputs" >:: fun _ ->
-      assert_raises Command.Unrecognized (fun () -> Command.parse "request") );
-    ( "Testing unrecognized" >:: fun _ ->
-      assert_raises Command.Unrecognized (fun () -> Command.parse "BADINPUTS")
-    );
     ( "Drawing multiple cards at once" >:: fun _ ->
       assert_equal [ 1; 1; 1 ] (State.repeat_add_card player0 1 3 |> print_hand)
     );
@@ -481,6 +477,41 @@ let command_tests =
     ( "deleting non-existent cards in hand" >:: fun _ ->
       assert_equal [ 2 ]
         (State.repeat_add_card player0 2 1 |> State.delete_cards 5 |> print_hand)
+    );
+  ]
+
+(****************************************************************************
+  Testing command.ml functions
+  ***************************************************************************)
+let command_tests =
+  [
+    ( "Testing expected quit string" >:: fun _ ->
+      assert_equal Command.Quit (Command.parse "quit") );
+    ( "Testing random capitalization" >:: fun _ ->
+      assert_equal Command.Quit (Command.parse "QUiT") );
+    ( "Testing extra spaces in quit" >:: fun _ ->
+      assert_equal Command.Quit (Command.parse " Quit  ") );
+    ( "Testing extra spaces in quit" >:: fun _ ->
+      assert_equal Command.Quit (Command.parse " QuIt  ") );
+    ( "Testing bad quit input" >:: fun _ ->
+      assert_raises Command.Unrecognized (fun () -> Command.parse "qu it") );
+    ( "Testing quit with added params" >:: fun _ ->
+      assert_raises Command.Unrecognized (fun () ->
+          Command.parse "quit asdf asdfsaf") );
+    ( "Testing normal request input" >:: fun _ ->
+      assert_equal
+        (Command.Request ("iram", 5))
+        (Command.parse "request iram 5") );
+    ( "Testing normal request input capitalization changes" >:: fun _ ->
+      assert_equal
+        (Command.Request ("joe", 51))
+        (Command.parse "REQUEST joe 51") );
+    ( "Testing empty" >:: fun _ ->
+      assert_raises Command.Empty (fun () -> Command.parse "") );
+    ( "Testing request with no other inputs" >:: fun _ ->
+      assert_raises Command.Unrecognized (fun () -> Command.parse "request") );
+    ( "Testing unrecognized" >:: fun _ ->
+      assert_raises Command.Unrecognized (fun () -> Command.parse "BADINPUTS")
     );
   ]
 
