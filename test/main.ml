@@ -516,10 +516,22 @@ let command_tests =
       assert_equal
         (Command.Request ("iram", 5))
         (Command.parse "request iram 5") );
-    ( "Testing normal request input capitalization changes" >:: fun _ ->
+    ( "Testing normal request input all caps" >:: fun _ ->
       assert_equal
         (Command.Request ("joe", 51))
         (Command.parse "REQUEST joe 51") );
+    ( "Testing normal request input mixed caps" >:: fun _ ->
+      assert_equal
+        (Command.Request ("joe", 51))
+        (Command.parse "ReqUESt joe 51") );
+    ( "Testing normal request input extra spaces" >:: fun _ ->
+      assert_equal
+        (Command.Request ("joe", 51))
+        (Command.parse "   request    joe 51") );
+    ( "Testing normal request input extra spaces" >:: fun _ ->
+      assert_equal
+        (Command.Request ("joe", 51))
+        (Command.parse "   request    joe 51") );
     ( "Testing empty" >:: fun _ ->
       assert_raises Command.Empty (fun () -> Command.parse "") );
     ( "Testing request with no other inputs" >:: fun _ ->
