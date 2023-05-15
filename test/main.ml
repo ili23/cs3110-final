@@ -299,6 +299,20 @@ let game_tests =
         (pp_player
            (State.assign_id full_game 0
            |> State.next_turn 4 |> State.get_current_player)) );
+    ( "Current player with id is matched to correct player after two turns"
+    >:: fun _ ->
+      assert_equal "Goblin"
+        (pp_player
+           (State.assign_id full_game 0
+           |> State.next_turn 4 |> State.next_turn 4 |> State.get_current_player
+           )) );
+    ( "Current player with id is matched to correct player after three turns"
+    >:: fun _ ->
+      assert_equal "Dragon"
+        (pp_player
+           (State.assign_id full_game 0
+           |> State.next_turn 4 |> State.next_turn 4 |> State.next_turn 4
+           |> State.get_current_player)) );
     ( "Get winner at beginning of game" >:: fun _ ->
       assert_equal
         [ "Dragon"; "Goblin"; "Musketeer"; "Hog Rider" ]
@@ -502,12 +516,27 @@ let command_tests =
       assert_equal
         (Command.Request ("iram", 5))
         (Command.parse "request iram 5") );
-    ( "Testing normal request input capitalization changes" >:: fun _ ->
+    ( "Testing normal request input all caps" >:: fun _ ->
       assert_equal
         (Command.Request ("joe", 51))
         (Command.parse "REQUEST joe 51") );
+    ( "Testing normal request input mixed caps" >:: fun _ ->
+      assert_equal
+        (Command.Request ("joe", 51))
+        (Command.parse "ReqUESt joe 51") );
+    ( "Testing normal request input extra spaces" >:: fun _ ->
+      assert_equal
+        (Command.Request ("joe", 51))
+        (Command.parse "   request    joe 51") );
+    ( "Testing normal request input extra spaces after params" >:: fun _ ->
+      assert_equal
+        (Command.Request ("joe", 51))
+        (Command.parse "request joe     51   ") );
     ( "Testing empty" >:: fun _ ->
       assert_raises Command.Empty (fun () -> Command.parse "") );
+    ( "Testing request and quit in same string" >:: fun _ ->
+      assert_raises Command.Unrecognized (fun () ->
+          Command.parse "request quit") );
     ( "Testing request with no other inputs" >:: fun _ ->
       assert_raises Command.Unrecognized (fun () -> Command.parse "request") );
     ( "Testing unrecognized" >:: fun _ ->
