@@ -19,10 +19,10 @@ let rec to_string lst =
   | h :: t -> h ^ "_" ^ to_string t
 
 let initialize_name i =
-  print_endline
+  ANSITerminal.print_string [ ANSITerminal.blue ]
     ("Please enter the name of player "
     ^ string_of_int (i + 1)
-    ^ " (must be a string)");
+    ^ " (must be a string)\n");
   print_string ">> ";
   let words = String.split_on_char ' ' (read_line ()) in
   let full_words = List.filter remove_empty words in
@@ -71,34 +71,37 @@ let rec print_hand p_list =
   match p_list with
   | [] -> ()
   | h :: t ->
-      print_endline
-        ("Your hand is: " ^ cards_to_string (State.get_player_hand h));
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        ("Your hand is: " ^ cards_to_string (State.get_player_hand h) ^ "\n.");
       print_hand t
 
 let rec print_deck deck =
   match deck with
   | [] -> ()
   | h :: t ->
-      print_string (string_of_int h);
+      ANSITerminal.print_string [ ANSITerminal.blue ] (string_of_int h);
       print_string " ";
       print_deck t
 
 let rec print_players p_list =
   match p_list with
   | [] -> ()
-  | [ h ] -> print_string ("and " ^ State.get_player_name h)
+  | [ h ] ->
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        ("and " ^ State.get_player_name h)
   | h :: t ->
       print_string (State.get_player_name h ^ ", ");
       print_players t
 
 let parse_command state =
-  print_endline "Please request a card from a player";
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    "Please request a card from a player. \n";
   print_string ">> ";
   try Command.parse (read_line ())
   with Command.Unrecognized | Command.Empty ->
-    print_endline
+    ANSITerminal.print_string [ ANSITerminal.blue ]
       "Invalid request given. Enter another request. Remember the format is \
-       'Request <player name> <card>";
+       'Request <player name> <card> \n";
     raise Command.Unrecognized
 
 let rec name_check (name : string) player_list =
@@ -119,20 +122,20 @@ let rec print_log list num =
   | [] -> print_endline ""
   | h :: t ->
       if num > 0 then (
-        print_endline (h ^ "\n");
+        ANSITerminal.print_string [ ANSITerminal.blue ] (h ^ "\n\n");
         print_log t (num - 1))
       else print_endline h
 
 let full_print_log list num =
   print_string scrollTerminal;
-  print_endline "Log: ";
+  ANSITerminal.print_string [ ANSITerminal.blue ] "Log: \n";
   print_log list num
 
 let rec print_names p_list =
   match p_list with
   | [] -> ()
   | h :: t ->
-      print_string (State.get_player_name h);
+      ANSITerminal.print_string [ ANSITerminal.blue ] (State.get_player_name h);
       print_string "     ";
       print_names t
 
@@ -140,7 +143,8 @@ let rec print_scores p_list =
   match p_list with
   | [] -> ()
   | h :: t ->
-      print_string (string_of_int (State.get_score h));
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        (string_of_int (State.get_score h));
       print_string "     ";
       print_names t
 
@@ -155,13 +159,14 @@ let rec shift_ready state num input =
       let _ = print_deck (State.get_deck state) in
       state
   | i when String.lowercase_ascii i = "quit" ->
-      print_endline "Farewell Go Fish-ers ";
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "Thanks for playing! Farewell Go Fish-ers! \n";
       exit 0
   | i ->
-      print_endline
+      ANSITerminal.print_string [ ANSITerminal.blue ]
         "Not recognized, if you are ready to see your cards, enter 'ready' \
          without spaces or extra characters or if you want to quit, enter \
-         'quit' \n";
+         'quit' \n\n";
       print_string ">> ";
       let new_input = read_line () in
       shift_ready state num new_input
@@ -173,9 +178,9 @@ let one_turn state name card num =
   if State.has_card card sender then (
     let count = State.count_cards card sender in
     let new_state = State.exchange_cards current_player sender card state in
-    print_endline
+    ANSITerminal.print_string [ ANSITerminal.blue ]
       (string_of_int count ^ " " ^ cards_to_string [ card ] ^ plural count
-     ^ " received from " ^ name);
+     ^ " received from " ^ name ^ "\n");
     let logged_state =
       State.add_log new_state
         (State.get_player_name current_player
@@ -188,12 +193,13 @@ let one_turn state name card num =
         State.update_player logged_state curr_player
           (State.add_quad curr_player)
       in
-      print_endline
-        ("Congrats you collected all 4 " ^ cards_to_string [ card ] ^ "s");
-      print_endline
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        ("Congrats you collected all 4 " ^ cards_to_string [ card ] ^ "s\n");
+      ANSITerminal.print_string [ ANSITerminal.blue ]
         ("Your new score is: "
         ^ string_of_int
-            (State.get_score (State.get_current_player newest_state)));
+            (State.get_score (State.get_current_player newest_state))
+        ^ "\n");
       let log_state =
         State.add_log newest_state
           (State.get_player_name current_player
@@ -202,7 +208,8 @@ let one_turn state name card num =
       log_state)
     else logged_state)
   else (
-    print_endline "You guessed incorrectly! Go Fish!";
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      "You guessed incorrectly! Go Fish!\n";
     let logged_state =
       State.add_log state
         (State.get_player_name current_player
@@ -210,22 +217,22 @@ let one_turn state name card num =
         ^ cards_to_string [ card ] ^ " from " ^ name)
     in
     let new_draw_player = State.draw_from_pile logged_state current_player in
-    print_endline
+    ANSITerminal.print_string [ ANSITerminal.blue ]
       ("You drew "
       ^ vowel (State.check_top_card state)
       ^ " "
       ^ cards_to_string [ State.check_top_card state ]
-      ^ " from the deck!");
+      ^ " from the deck! \n");
     let new_deck_state = State.remove_card_top 1 logged_state in
     let new_state =
       State.update_player new_deck_state current_player new_draw_player
     in
     let newest = State.next_turn num new_state in
     print_string scrollTerminal;
-    print_endline
+    ANSITerminal.print_string [ ANSITerminal.blue ]
       "Are you ready to see your cards? Make sure that the other players can't \
        see your cards. If you are ready, type 'ready'. As per usual, type \
-       'quit' to leave the game. ";
+       'quit' to leave the game. \n";
     let input = read_line () in
     shift_ready newest num input)
 
@@ -268,29 +275,32 @@ let rec game_cycle (state : State.state) num =
               let new_state = one_turn state name card num in
               game_cycle new_state num
             else (
-              print_endline
+              ANSITerminal.print_string [ ANSITerminal.blue ]
                 "Invalid name. Make sure to check your spelling and the \
-                 request format.";
+                 request format. \n";
               game_cycle state num)
           else (
-            print_endline
+            ANSITerminal.print_string [ ANSITerminal.blue ]
               "You can only request cards you have. Make sure to double check \
-               your input and the request format.";
+               your input and the request format.\n";
             game_cycle state num)
       | Command.Quit ->
-          print_endline
+          ANSITerminal.print_string [ ANSITerminal.blue ]
             "Thank you for playing the game, hope you had fun, Farewell Go \
-             Fish-ers!";
+             Fish-ers!\n";
           exit 0
     with Command.Unrecognized -> game_cycle state num
   else if has_cards then (
-    print_endline
-      "There are no more cards left in the deck which means the game is over";
-    print_endline (State.check_winner state |> print_winner);
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      "There are no more cards left in the deck which means the game is over. \n";
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      ((State.check_winner state |> print_winner) ^ "\n");
     exit 0)
   else (
-    print_endline "A player is out of cards";
-    print_endline (State.check_winner state |> print_winner);
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      "A player is out of cards which means that the game is over.\n";
+    ANSITerminal.print_string [ ANSITerminal.blue ]
+      ((State.check_winner state |> print_winner) ^ "\n");
     exit 0)
 
 let rec move_next state num input =
