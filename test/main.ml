@@ -130,6 +130,9 @@ let initialization_tests =
         (State.get_current_player_state (State.assign_id full_game 0)) );
   ]
 
+(****************************************************************************
+  Setting up decks/players to be used in testing.
+  ***************************************************************************)
 let deck1 =
   let d = Array.make 52 1 in
   for x = 1 to 13 do
@@ -159,7 +162,42 @@ let incomplete_deck =
 
 let game_with_deck1 = State.set_deck full_game deck1
 let game_with_deck2 = State.set_deck full_game deck2
+let player0_scored1 = State.set_score player0 1
+let player1_scored1 = State.set_score player1 2
+let player2_scored1 = State.set_score player2 3
+let player3_scored1 = State.set_score player3 4
 
+let score_game_1 =
+  let temp = State.update_player full_game player0 player0_scored1 in
+  let temp1 = State.update_player temp player1 player1_scored1 in
+  let temp2 = State.update_player temp1 player2 player2_scored1 in
+  State.update_player temp2 player3 player3_scored1
+
+let player0_scored2 = State.set_score player0 2
+let player1_scored2 = State.set_score player1 2
+let player2_scored2 = State.set_score player2 4
+let player3_scored2 = State.set_score player3 4
+
+let score_game_2 =
+  let temp = State.update_player full_game player0 player0_scored2 in
+  let temp1 = State.update_player temp player1 player1_scored2 in
+  let temp2 = State.update_player temp1 player2 player2_scored2 in
+  State.update_player temp2 player3 player3_scored2
+
+let player0_scored3 = State.set_score player0 3
+let player1_scored3 = State.set_score player1 4
+let player2_scored3 = State.set_score player2 4
+let player3_scored3 = State.set_score player3 4
+
+let score_game_3 =
+  let temp = State.update_player full_game player0 player0_scored3 in
+  let temp1 = State.update_player temp player1 player1_scored3 in
+  let temp2 = State.update_player temp1 player2 player2_scored3 in
+  State.update_player temp2 player3 player3_scored3
+
+(****************************************************************************
+  Testing state.ml functions continued
+  ***************************************************************************)
 let initialize_hand_test =
   [
     ( "Initialize game1" >:: fun _ ->
@@ -229,6 +267,18 @@ let game_tests =
         (pp_player
            (State.assign_id full_game 0
            |> State.next_turn 4 |> State.get_current_player)) );
+    ( "Get winner when all players have same scores" >:: fun _ ->
+      assert_equal
+        [ "Dragon"; "Goblin"; "Musketeer"; "Hog Rider" ]
+        (State.check_winner full_game) );
+    ( "Get winner one winner" >:: fun _ ->
+      assert_equal [ "Dragon" ] (State.check_winner score_game_1) );
+    ( "Get winner two winners" >:: fun _ ->
+      assert_equal [ "Dragon"; "Goblin" ] (State.check_winner score_game_2) );
+    ( "Get winner three winners" >:: fun _ ->
+      assert_equal
+        [ "Dragon"; "Goblin"; "Musketeer" ]
+        (State.check_winner score_game_3) );
   ]
 
 let exchange_tests =

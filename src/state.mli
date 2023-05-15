@@ -10,6 +10,8 @@ type player
 type state
 (** The abstract type of values representing a game state. *)
 
+type player_and_score
+
 val init_player : string -> player
 (** [init_player a] creates a player with the name a. *)
 
@@ -127,7 +129,14 @@ val get_hand : player -> int list
 val check_top_card : state -> int
 (** [check_top_card st] returns the top card in the deck of st. *)
 
+val get_log : state -> string list
+val add_log : state -> string -> state
+
+val check_winner : state -> string list
+val set_score : player -> int -> player
+
 exception NoPlayer
 exception NoCardsLeft
 exception Illegal
 exception Temporary
+exception Impossible

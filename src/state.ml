@@ -14,6 +14,7 @@ type state = {
   deck : int list;
   players : player list;
   current_player : int;
+  log : string list;
 }
 
 (****************************************************************************
@@ -24,6 +25,7 @@ exception Temporary
 exception NoCardsLeft
 exception NoPlayer
 exception Illegal
+exception Impossible
 
 (****************************************************************************
   Helper functions for general state funtions.
@@ -55,7 +57,7 @@ let shuffle =
 let init_player name =
   { name; ready = false; id = -1; hand = []; score = 0; won_cards = [] }
 
-let init_state = { deck = shuffle; players = []; current_player = 0 }
+let init_state = { deck = shuffle; players = []; current_player = 0; log = [] }
 
 let add_player player game_state =
   { game_state with players = game_state.players @ [ player ] }
@@ -90,6 +92,7 @@ let get_player_name player = player.name
 let get_score player = player.score
 let get_won_cards player = player.won_cards
 let get_hand player = player.hand
+let get_log state = state.log
 
 (****************************************************************************
   Other functions related to states.
@@ -109,6 +112,10 @@ let check_deck state =
 
 let add_card player card =
   { player with hand = List.sort compare (card :: player.hand) }
+
+let add_log state string =
+  let old_log = state.log in
+  { state with log = old_log @ [ string ] }
 
 (** Used to remove num top cards in deck.*)
 let remove_card_top num state =
@@ -213,3 +220,38 @@ let rec find_player name player_list =
   match player_list with
   | [] -> raise NoPlayer
   | h :: t -> if h.name = name then h else find_player name t
+
+(** Used for writing test cases*)
+let set_score player num = { player with score = num }
+
+type player_and_score = {
+  player : string;
+  score : int;
+}
+
+let check_winner state =
+  let rec get_all_scores pl_list =
+    match pl_list with
+    | [] -> []
+    | h :: t ->
+        { player = get_player_name h; score = get_score h } :: get_all_scores t
+  in
+  let scores = get_all_scores (get_player_list state) in
+  let rec find_top_scores lst acc =
+    match lst with
+    | [] -> acc
+    | h :: t -> (
+        match acc with
+        | [] -> find_top_scores t [ h ]
+        | x :: y ->
+            if h.score = x.score then find_top_scores t (h :: acc)
+            else if h.score > x.score then find_top_scores t [ h ]
+            else find_top_scores t acc)
+  in
+  let top_players = find_top_scores scores [] in
+  let rec extract_player_names pl_score_list =
+    match pl_score_list with
+    | [] -> []
+    | h :: t -> h.player :: extract_player_names t
+  in
+  extract_player_names top_players
