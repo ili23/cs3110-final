@@ -279,6 +279,14 @@ let game_tests =
       assert_equal
         [ "Dragon"; "Goblin"; "Musketeer" ]
         (State.check_winner score_game_3) );
+    ("No actions in log" >:: fun _ -> assert_equal [] (State.get_log full_game));
+    ( "Add one action to log" >:: fun _ ->
+      assert_equal [ "Test" ] (State.add_log full_game "Test" |> State.get_log)
+    );
+    ( "Add two actions to log" >:: fun _ ->
+      assert_equal [ "Test2"; "Test" ]
+        (State.add_log (State.add_log full_game "Test2") "Test" |> State.get_log)
+    );
   ]
 
 let exchange_tests =
