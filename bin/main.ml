@@ -16,11 +16,13 @@ let rec int_list_to_string lst =
 let rec to_string lst =
   match lst with
   | [] -> ""
-  | h :: t -> h ^ to_string t
+  | h :: t -> h ^ "_" ^ to_string t
 
 let initialize_name i =
   print_endline
-    ("Please enter the name of player (must be a string) " ^ string_of_int i);
+    ("Please enter the name of player "
+    ^ string_of_int (i + 1)
+    ^ " (must be a string)");
   print_string "> ";
   let words = String.split_on_char ' ' (read_line ()) in
   let full_words = List.filter remove_empty words in
@@ -65,7 +67,9 @@ let parse_command state =
   print_string "> ";
   try Command.parse (read_line ())
   with Command.Unrecognized | Command.Empty ->
-    print_endline "Invalid request given. Enter another request.";
+    print_endline
+      "Invalid request given. Enter another request. Remember the format is \
+       'Request <player name> <card>";
     raise Command.Unrecognized
 
 let rec name_check (name : string) player_list =
@@ -119,7 +123,7 @@ let rec game_cycle (state : State.state) num =
               "You can only request cards you have. Enter another command";
             game_cycle state num)
       | Command.Quit ->
-          print_endline "Farewell go fish-ers";
+          print_endline "Farewell Go Fish-ers";
           exit 0
     with Command.Unrecognized -> game_cycle state num
   else (
@@ -144,17 +148,19 @@ let start_game num =
     print_endline "Request cards from a player by typing 'Request <player name>
     <card>'"; print_endline "Fire, let's get started!"*)
 
-let rec play_game number_player =
-  match number_player with
-  | i when i < 3 ->
+let rec play_game input =
+  match input with
+  | i when String.lowercase_ascii i = "ready" -> start_game 4
+  | i when String.lowercase_ascii i = "quit" ->
+      print_endline "Farewell Go Fish-ers ";
+      exit 0
+  | i ->
       print_endline
-        "You can't start with less than 3 players, get some more friends. \n";
-      print_endline "Please enter the number of players for the game.\n";
+        "Not recognized, if you want to play the game, enter 'ready' without \
+         spaces or extra characters or if you want to quit, enter 'quit' \n";
       print_string "> ";
-      let input = read_line () in
-      play_game (int_of_string input)
-  | i when i > 2 -> start_game i
-  | _ -> exit 1
+      let new_input = read_line () in
+      play_game new_input
 
 (** [main ()] prompts for the game to play, then starts it. *)
 let main () =
@@ -163,18 +169,27 @@ let main () =
     "\n\nWelcome to Big Bactrian's Camel's Implementation of Go Fish.\n";
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "Here are some rules/tips to ensure the best experience: \n\n\
-    \    Since the game is meant to be played on one device with each player \
+    \ Since the game is meant to be played on one device with each player \
      passing the device around, there will be some honor code built in. Don't \
      scroll through the terminal during your turn to look at other people's \
-     hands. \n\
+     hands. This also means that you shouldn't change the terminal size. (Use \
+     the default MacOS terminal for the best experience.) \n\n\
     \ ";
-  print_endline
-    "Please enter the number of players for the game. (Enter an integer less \
-     than 10)\n";
-  print_string "> ";
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    "Now on how to play the game: Placeholder \n ";
+  (* Need rules description here, we made it a 4 person game so def say
+     something bout that here*)
+  ANSITerminal.print_string [ ANSITerminal.blue ]
+    "Further instructions will be given later to help you. If all four players \
+     have fully read and accept the rules, type 'ready' to begin! \
+     Alternatively, type 'quit' if you don't want to play the game \n\n\
+    \ ";
+  print_string ">> ";
   match read_line () with
+  | x -> play_game x
   | exception End_of_file -> ()
-  | number -> play_game (int_of_string number)
+
+(*number -> *)
 
 (*Need to add a check here to make sure that the input is an int*)
 (* Execute the game engine. *)
