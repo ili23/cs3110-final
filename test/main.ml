@@ -1,4 +1,22 @@
 open OUnit2
+(** Test plan: Our game involved two components, the backend (src/state.ml &
+    src/command.ml) where we update and change game states and process commands
+    and a frontend terminal (bin/main.ml) where users can enter their commands.
+    For the backend, we decided it was best to create a test suite with both
+    black/glass box tests to ensure correctness. This combination ensures that
+    our code will output the expected results and glassbox testing allows us to
+    breakdown our implementation and check every possible pattern match/if-else
+    case. Something that we did for glassbox testing that may not have
+    necessarily been best practice is writing functions to expose certain
+    features so that we can actually test the outputs. These functions were only
+    used in testing and not the actual program. Now for the frontend, it is much
+    harder to write test cases for the front end since we have to simulate user
+    inputs so we decided to manually test it. Again, we "simulated" glass box
+    testing by typing in inputs that would cover all patten match/if-else cases.
+    We believe that by using this combination of black and glass box testing, we
+    were able to see all the possible paths that our game takes and they were
+    all expected. *)
+
 open Game
 (****************************************************************************
   Helper functions to pretty print and test various data structures needed in
