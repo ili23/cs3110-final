@@ -3,5 +3,4 @@ Please follow the instructions at this link, https://cs3110.github.io/textbook/c
 to install OCaml if it is not already on your computer. 
 
 Open up a terminal from our project, change working directory to this project 
-and run [make play] to start the game. 
-You will prompted with the number of players the game will have. Please only enter an integer.  
+and run [make play] to start the game. Make sure to read and follow the prompts. 
