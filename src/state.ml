@@ -20,12 +20,10 @@ type state = {
 (****************************************************************************
   Exceptions needed for states.
   ***************************************************************************)
-exception Filler
-exception Temporary
+
 exception NoCardsLeft
 exception NoPlayer
 exception Illegal
-exception Impossible
 
 (****************************************************************************
   Helper functions for general state funtions.
@@ -207,14 +205,14 @@ let rec initialize_players_hands deck players =
       match deck with
       | h1 :: h2 :: h3 :: h4 :: h5 :: q ->
           [ { h with hand = h1 :: h2 :: h3 :: h4 :: h5 :: h.hand } ]
-      | _ -> raise Temporary)
+      | _ -> raise Illegal)
   | h :: t -> (
       match deck with
       | h1 :: h2 :: h3 :: h4 :: h5 :: q ->
           { h with hand = h1 :: h2 :: h3 :: h4 :: h5 :: h.hand }
           :: initialize_players_hands q t
-      | _ -> raise Temporary)
-  | [] -> raise Temporary
+      | _ -> raise Illegal)
+  | [] -> raise Illegal
 
 let rec find_player name player_list =
   match player_list with
