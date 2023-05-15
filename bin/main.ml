@@ -73,7 +73,7 @@ let rec print_hand p_list =
   | [] -> ()
   | h :: t ->
       ANSITerminal.print_string [ ANSITerminal.blue ]
-        ("Your hand is: " ^ cards_to_string (State.get_player_hand h) ^ "\n");
+        ("Your hand is: " ^ cards_to_string (State.get_player_hand h));
       print_hand t
 
 let rec print_players p_list =
@@ -163,7 +163,7 @@ let rec shift_ready state num input =
   match input with
   | i when String.lowercase_ascii i = "ready" ->
       let _ =
-        ANSITerminal.print_string [ ANSITerminal.blue ] "\n Game Log: \n"
+        ANSITerminal.print_string [ ANSITerminal.blue ] "\nGame Log: \n"
       in
       let _ = print_log (State.get_log state) 10 in
       let _ =
@@ -218,8 +218,8 @@ let one_turn state name card num =
     let count = State.count_cards card sender in
     let new_state = State.exchange_cards current_player sender card state in
     ANSITerminal.print_string [ ANSITerminal.blue ]
-      (string_of_int count ^ " " ^ cards_to_string [ card ] ^ plural count
-     ^ " received from " ^ name ^ "\n");
+      ("\n" ^ string_of_int count ^ " " ^ cards_to_string [ card ]
+     ^ plural count ^ " received from " ^ name ^ "\n");
     let logged_state =
       State.add_log new_state
         (State.get_player_name current_player
@@ -246,7 +246,8 @@ let one_turn state name card num =
       in
       log_state)
     else logged_state)
-  else (
+  else
+    let _ = print_string "\n" in
     ANSITerminal.print_string [ ANSITerminal.blue ]
       "You guessed incorrectly! Go Fish!\n";
     let logged_state =
@@ -261,7 +262,7 @@ let one_turn state name card num =
       ^ vowel (State.check_top_card state)
       ^ " "
       ^ cards_to_string [ State.check_top_card state ]
-      ^ " from the deck! \n");
+      ^ " from the deck! \n\n");
     let new_deck_state = State.remove_card_top 1 logged_state in
     let new_state =
       State.update_player new_deck_state current_player new_draw_player
@@ -273,7 +274,7 @@ let one_turn state name card num =
     print_string ">> ";
     let input = read_line () in
 
-    done_viewing newest num input)
+    done_viewing newest num input
 
 let rec print_winner lst =
   let rec concat_winner list =
@@ -359,7 +360,15 @@ let rec game_cycle (state : State.state) num =
 
 let rec move_next state num input =
   match input with
-  | i when String.lowercase_ascii i = "ready" -> game_cycle state num
+  | i when String.lowercase_ascii i = "ready" ->
+      let _ =
+        ANSITerminal.print_string [ ANSITerminal.blue ] "\nScoreboard: \n"
+      in
+      let _ = print_names (State.get_player_list state) in
+      let _ = print_string "\n" in
+      let _ = print_scores (State.get_player_list state) in
+      let _ = print_string "\n \n" in
+      game_cycle state num
   | i when String.lowercase_ascii i = "quit" ->
       ANSITerminal.print_string [ ANSITerminal.blue ] "Farewell Go Fish-ers \n";
       exit 0
