@@ -275,7 +275,7 @@ let initialize_hand_test =
               (State.get_player_list game_with_deck3))
            []) );
     ( "Raises exception on incomplete deck" >:: fun _ ->
-      assert_raises State.Temporary (fun () ->
+      assert_raises State.Illegal (fun () ->
           State.initialize_players_hands incomplete_deck
             (State.get_player_list game_with_deck2)) );
   ]
