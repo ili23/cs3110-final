@@ -128,10 +128,30 @@ let full_print_log list num =
   print_endline "Log: ";
   print_log list num
 
+let rec print_names p_list =
+  match p_list with
+  | [] -> ()
+  | h :: t ->
+      print_string (State.get_player_name h);
+      print_string "     ";
+      print_names t
+
+let rec print_scores p_list =
+  match p_list with
+  | [] -> ()
+  | h :: t ->
+      print_string (string_of_int (State.get_score h));
+      print_string "     ";
+      print_names t
+
 let rec shift_ready state num input =
   match input with
   | i when String.lowercase_ascii i = "ready" ->
       let _ = print_log (List.rev (State.get_log state)) 10 in
+      let _ = print_names (State.get_player_list state) in
+      let _ = print_string "\n" in
+      let _ = print_scores (State.get_player_list state) in
+      let _ = print_string "\n" in
       let _ = print_deck (State.get_deck state) in
       state
   | i when String.lowercase_ascii i = "quit" ->
@@ -154,12 +174,12 @@ let one_turn state name card num =
     let count = State.count_cards card sender in
     let new_state = State.exchange_cards current_player sender card state in
     print_endline
-      (string_of_int count ^ " " ^ string_of_int card ^ plural count
+      (string_of_int count ^ " " ^ cards_to_string [ card ] ^ plural count
      ^ " received from " ^ name);
     let logged_state =
       State.add_log new_state
         (State.get_player_name current_player
-        ^ " received " ^ string_of_int count ^ " " ^ string_of_int card
+        ^ " received " ^ string_of_int count ^ " " ^ cards_to_string [ card ]
         ^ plural count ^ " from " ^ name)
     in
     let curr_player = State.get_current_player logged_state in
@@ -168,7 +188,8 @@ let one_turn state name card num =
         State.update_player logged_state curr_player
           (State.add_quad curr_player)
       in
-      print_endline ("Congrats you collected all 4 " ^ string_of_int card ^ "s");
+      print_endline
+        ("Congrats you collected all 4 " ^ cards_to_string [ card ] ^ "s");
       print_endline
         ("Your new score is: "
         ^ string_of_int
@@ -176,7 +197,7 @@ let one_turn state name card num =
       let log_state =
         State.add_log newest_state
           (State.get_player_name current_player
-          ^ " collected all 4 " ^ string_of_int card ^ "s")
+          ^ " collected all 4 " ^ cards_to_string [ card ] ^ "s")
       in
       log_state)
     else logged_state)
@@ -186,14 +207,14 @@ let one_turn state name card num =
       State.add_log state
         (State.get_player_name current_player
         ^ " unsuccessfully requested for " ^ vowel card ^ " "
-        ^ string_of_int card ^ " from " ^ name)
+        ^ cards_to_string [ card ] ^ " from " ^ name)
     in
     let new_draw_player = State.draw_from_pile logged_state current_player in
     print_endline
       ("You drew "
       ^ vowel (State.check_top_card state)
       ^ " "
-      ^ string_of_int (State.check_top_card state)
+      ^ cards_to_string [ State.check_top_card state ]
       ^ " from the deck!");
     let new_deck_state = State.remove_card_top 1 logged_state in
     let new_state =
@@ -213,8 +234,15 @@ let rec print_winner lst =
   | [] -> ""
   | h :: t -> h ^ ", " ^ print_winner t
 
+let rec card_checker p_list =
+  match p_list with
+  | [] -> true
+  | h :: t ->
+      if List.length (State.get_hand h) = 0 then false else card_checker t
+
 let rec game_cycle (state : State.state) num =
-  if State.check_deck state then
+  let has_cards = card_checker (State.get_player_list state) in
+  if State.check_deck state && has_cards then
     let _ = print_hand [ State.get_current_player state ] in
     let _ = print_endline "\n" in
     try
@@ -245,8 +273,12 @@ let rec game_cycle (state : State.state) num =
              Fish-ers!";
           exit 0
     with Command.Unrecognized -> game_cycle state num
-  else (
+  else if has_cards then (
     print_endline "No more cards left in the deck. The game is over";
+    print_endline (State.check_winner state |> print_winner);
+    exit 0)
+  else (
+    print_endline "A player is out of cards";
     print_endline (State.check_winner state |> print_winner);
     exit 0)
 

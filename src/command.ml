@@ -14,8 +14,13 @@ let rec parse_helper str =
   match filtered with
   | [] -> raise Empty
   | [ h ] when h = "quit" -> Quit
-  | [ h; t1; t2 ] when h = "request" && List.length filtered > 2 ->
-      Request (t1, int_of_string t2)
+  | [ h; t1; t2 ] when h = "request" && List.length filtered > 2 -> (
+      match t2 with
+      | "a" -> Request (t1, 1)
+      | "j" -> Request (t1, 11)
+      | "q" -> Request (t1, 12)
+      | "k" -> Request (t1, 13)
+      | _ -> Request (t1, int_of_string t2))
   | _ -> raise Unrecognized
 
 let parse str = parse_helper str
