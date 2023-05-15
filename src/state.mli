@@ -87,6 +87,7 @@ val get_log : state -> string list
 val add_log : state -> string -> state
 val check_top_card : state -> int
 val check_winner : state -> string list
+val set_score : player -> int -> player
 
 exception NoPlayer
 exception NoCardsLeft
