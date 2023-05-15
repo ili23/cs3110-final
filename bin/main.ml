@@ -23,7 +23,7 @@ let initialize_name i =
     ("Please enter the name of player "
     ^ string_of_int (i + 1)
     ^ " (must be a string)");
-  print_string "> ";
+  print_string ">> ";
   let words = String.split_on_char ' ' (read_line ()) in
   let full_words = List.filter remove_empty words in
   match full_words with
@@ -93,7 +93,7 @@ let rec print_players p_list =
 
 let parse_command state =
   print_endline "Please request a card from a player";
-  print_string "> ";
+  print_string ">> ";
   try Command.parse (read_line ())
   with Command.Unrecognized | Command.Empty ->
     print_endline
@@ -132,7 +132,6 @@ let rec shift_ready state num input =
   match input with
   | i when String.lowercase_ascii i = "ready" ->
       let _ = print_log (List.rev (State.get_log state)) 10 in
-      let _ = print_deck (State.get_deck state) in
       state
   | i when String.lowercase_ascii i = "quit" ->
       print_endline "Farewell Go Fish-ers ";
@@ -247,7 +246,8 @@ let rec game_cycle (state : State.state) num =
     with Command.Unrecognized -> game_cycle state num
   else (
     print_endline "No more cards left in the deck. The game is over";
-    print_endline (State.check_winner state |> print_winner);
+    print_string "The winner is: ";
+    print_endline (State.check_winner state |> String.concat " ");
     exit 0)
 
 let rec move_next state num input =
@@ -292,13 +292,14 @@ let rec play_game input =
   match input with
   | i when String.lowercase_ascii i = "ready" -> start_game 4
   | i when String.lowercase_ascii i = "quit" ->
-      print_endline "Farewell Go Fish-ers ";
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "Farewell Go Fish-ers. See you soon!";
       exit 0
   | i ->
       print_endline
         "Not recognized, if you want to play the game, enter 'ready' without \
          spaces or extra characters or if you want to quit, enter 'quit' \n";
-      print_string "> ";
+      print_string ">> ";
       let new_input = read_line () in
       play_game new_input
 

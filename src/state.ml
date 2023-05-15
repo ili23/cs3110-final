@@ -35,15 +35,15 @@ let gen_rand_int bound =
   Random.int bound
 
 let shuffle =
-  let d = Array.make 24 1 in
+  let d = Array.make 13 1 in
   for x = 1 to 6 do
     for y = 0 to 3 do
       Array.set d ((4 * (x - 1)) + y) x
     done
   done;
   for x = 0 to 100 do
-    let x_1 = gen_rand_int 24 in
-    let x_2 = gen_rand_int 24 in
+    let x_1 = gen_rand_int 52 in
+    let x_2 = gen_rand_int 52 in
     let x_1_value = Array.get d x_1 in
     let x_2_value = Array.get d x_2 in
     Array.set d x_2 x_1_value;
@@ -227,17 +227,18 @@ type player_and_score = {
 }
 
 let check_winner state =
-  let rec get_all_scores pl_list acc =
+  let rec get_all_scores pl_list =
     match pl_list with
-    | [] -> acc
-    | h :: t -> { player = get_player_name h; score = get_score h } :: acc
+    | [] -> []
+    | h :: t ->
+        { player = get_player_name h; score = get_score h } :: get_all_scores t
   in
-  let scores = get_all_scores (get_player_list state) [] in
+  let scores = get_all_scores (get_player_list state) in
   let rec find_top_scores lst acc =
     match lst with
     | [] -> acc
     | h :: t -> (
-        match lst with
+        match acc with
         | [] -> find_top_scores t [ h ]
         | x :: y ->
             if h.score = x.score then find_top_scores t (h :: acc)
