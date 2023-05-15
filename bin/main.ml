@@ -23,7 +23,7 @@ let initialize_name i =
     ("Please enter the name of player "
     ^ string_of_int (i + 1)
     ^ " (must be a string)");
-  print_string "> ";
+  print_string ">> ";
   let words = String.split_on_char ' ' (read_line ()) in
   let full_words = List.filter remove_empty words in
   match full_words with
@@ -82,7 +82,7 @@ let rec print_players p_list =
 
 let parse_command state =
   print_endline "Please request a card from a player";
-  print_string "> ";
+  print_string ">> ";
   try Command.parse (read_line ())
   with Command.Unrecognized | Command.Empty ->
     print_endline
@@ -245,7 +245,7 @@ let rec play_game input =
       print_endline
         "Not recognized, if you want to play the game, enter 'ready' without \
          spaces or extra characters or if you want to quit, enter 'quit' \n";
-      print_string "> ";
+      print_string ">> ";
       let new_input = read_line () in
       play_game new_input
 
