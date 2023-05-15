@@ -93,7 +93,7 @@ let parse_command state =
   with Command.Unrecognized | Command.Empty ->
     ANSITerminal.print_string [ ANSITerminal.blue ]
       "Invalid request given. Enter another request. Remember the format is \
-       'Request <player name> <card> \n";
+       'Request <player name> <card>' \n";
     raise Command.Unrecognized
 
 let rec name_check (name : string) player_list =
@@ -366,19 +366,42 @@ let main () =
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "\n\nWelcome to Big Bactrian's Camel's Implementation of Go Fish.\n";
   ANSITerminal.print_string [ ANSITerminal.blue ]
-    "Here are some rules/tips to ensure the best experience: \n\n\
-    \ Since the game is meant to be played on one device with each player \
-     passing the device around, there will be some honor code built in. Don't \
-     scroll through the terminal during your turn to look at other people's \
-     hands. This also means that you shouldn't change the terminal size. (Use \
-     the default MacOS terminal for the best experience.) \n\n\
+    "\n\
+     Here are some rules/tips to ensure the best experience: \n\n\
+     Rules: \n\n\
+     Honor code: Since the game is meant to be played on one device with each \
+     player passing the device around, there will be some honor code built in. \
+     Don't scroll through the terminal during your turn to look at other \
+     people's hands. This also means that you shouldn't change the terminal \
+     size. (Use the default MacOS terminal for the best experience.) \n\
     \ ";
   ANSITerminal.print_string [ ANSITerminal.blue ]
-    "Now on how to play the game: Placeholder \n ";
+    "\n\
+     Now on how to play the game: Each player is initially dealt 5 cards. Each \
+     person gets a turn in the order they enter their name. Before each turn, \
+     the player whose turn it is will be asked to type in ready to make sure \
+     they are ready and are the only ones seeing their card. \n\n\
+     During a turn, a player can request a card from another player by typing \
+     in 'Request <player name> <card>' or quit the game by typing in 'Quit'. \
+     Players can only request for cards they already have in their hand. If \
+     the player successfully requests a card from another player, the cards \
+     are given to the current player, and the player can request again. \
+     Otherwise, the current player will 'Go Fish' and draws a card from the \
+     deck. \n\n\
+     If a player gets 4 of a kind (i.e. 4 of the same value), then they get 1 \
+     point added to their score. Those cards are removed from their hand. \n\
+     The game ends when a player runs out of cards or when there are no cards \
+     left in the deck to draw from. The winner(s) are the player(s) with the \
+     most points when the game ends. \n\n\
+     Tips: \n\n\
+     Check the log and scoreboard for information on what other players have \
+     been doing. \n\
+    \ ";
   (* Need rules description here, we made it a 4 person game so def say
      something bout that here*)
   ANSITerminal.print_string [ ANSITerminal.blue ]
-    "Further instructions will be given later to help you. If all four players \
+    "\n\
+     Further instructions will be given later to help you. If all four players \
      have fully read and accept the rules, type 'ready' to begin! \
      Alternatively, type 'quit' if you don't want to play the game \n\n\
     \ ";
