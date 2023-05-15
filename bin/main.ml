@@ -279,7 +279,8 @@ let rec play_game input =
   match input with
   | i when String.lowercase_ascii i = "ready" -> start_game 4
   | i when String.lowercase_ascii i = "quit" ->
-      print_endline "Farewell Go Fish-ers ";
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        "Farewell Go Fish-ers. See you soon!";
       exit 0
   | i ->
       print_endline
