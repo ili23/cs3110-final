@@ -89,6 +89,7 @@ let get_current_player state =
 let get_player_name player = player.name
 let get_score player = player.score
 let get_won_cards player = player.won_cards
+let get_hand player = player.hand
 
 (****************************************************************************
   Other functions related to states.

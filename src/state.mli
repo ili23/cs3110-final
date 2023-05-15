@@ -80,6 +80,7 @@ val check_quad : player -> int list
 val add_quad : player -> player
 val get_score : player -> int
 val get_won_cards : player -> int list
+val get_hand : player -> int list
 val check_top_card : state -> int
 
 exception NoPlayer

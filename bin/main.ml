@@ -46,12 +46,30 @@ let deal_cards state num =
 
 let ready_state num = State.assign_id (deal_cards (initial_state num) num) num
 
+let rec cards_to_string hand =
+  match hand with
+  | [] -> ""
+  | [ h ] -> (
+      match h with
+      | 1 -> "A"
+      | 11 -> "J"
+      | 12 -> "Q"
+      | 13 -> "K"
+      | _ -> string_of_int h)
+  | h :: t -> (
+      match h with
+      | 1 -> "A " ^ cards_to_string t
+      | 11 -> "J " ^ cards_to_string t
+      | 12 -> "Q " ^ cards_to_string t
+      | 13 -> "K " ^ cards_to_string t
+      | _ -> string_of_int h ^ " " ^ cards_to_string t)
+
 let rec print_hand p_list =
   match p_list with
   | [] -> ()
   | h :: t ->
       print_endline
-        ("Your hand is: " ^ int_list_to_string (State.get_player_hand h));
+        ("Your hand is: " ^ cards_to_string (State.get_player_hand h));
       print_hand t
 
 let rec print_players p_list =
