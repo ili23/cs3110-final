@@ -534,6 +534,10 @@ let command_tests =
       assert_equal
         (Command.Request ("iram", 5))
         (Command.parse "request iram 5") );
+    ( "Testing normal request input" >:: fun _ ->
+      assert_equal
+        (Command.Request ("bruh", 50))
+        (Command.parse "request bruh 50") );
     ( "Testing normal request input all caps" >:: fun _ ->
       assert_equal
         (Command.Request ("joe", 51))

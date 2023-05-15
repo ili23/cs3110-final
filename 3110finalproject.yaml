@@ -25,6 +25,3 @@ desc: >
   multiplayer terminal game follows the basic rules of the game with each player
   getting the chance to guess for a card that they want. If the player doesn't 
   guess correctly, they GoFish for a card. 
-
-  Currently, networking is not supported and the whole game can run in one 
-  terminal but, we will potentially look to expand later on. 
