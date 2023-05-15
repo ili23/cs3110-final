@@ -221,6 +221,9 @@ let rec find_player name player_list =
   | [] -> raise NoPlayer
   | h :: t -> if h.name = name then h else find_player name t
 
+(** Used for writing test cases*)
+let set_score player num = { player with score = num }
+
 type player_and_score = {
   player : string;
   score : int;
