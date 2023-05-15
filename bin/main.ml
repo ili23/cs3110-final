@@ -75,14 +75,6 @@ let rec print_hand p_list =
         ("Your hand is: " ^ cards_to_string (State.get_player_hand h) ^ "\n.");
       print_hand t
 
-let rec print_deck deck =
-  match deck with
-  | [] -> ()
-  | h :: t ->
-      ANSITerminal.print_string [ ANSITerminal.blue ] (string_of_int h);
-      print_string " ";
-      print_deck t
-
 let rec print_players p_list =
   match p_list with
   | [] -> ()
@@ -139,24 +131,32 @@ let rec print_names p_list =
       print_string "     ";
       print_names t
 
+let rec print_spaces num =
+  match num with
+  | 0 -> print_string " "
+  | _ ->
+      print_string " ";
+      print_spaces (num - 1)
+
 let rec print_scores p_list =
   match p_list with
   | [] -> ()
   | h :: t ->
       ANSITerminal.print_string [ ANSITerminal.blue ]
         (string_of_int (State.get_score h));
+      print_spaces (String.length (State.get_player_name h) - 2);
       print_string "     ";
-      print_names t
+      print_scores t
 
 let rec shift_ready state num input =
   match input with
   | i when String.lowercase_ascii i = "ready" ->
       let _ = print_log (List.rev (State.get_log state)) 10 in
+      let _ = print_endline "Scores: " in
       let _ = print_names (State.get_player_list state) in
       let _ = print_string "\n" in
       let _ = print_scores (State.get_player_list state) in
       let _ = print_string "\n" in
-      let _ = print_deck (State.get_deck state) in
       state
   | i when String.lowercase_ascii i = "quit" ->
       ANSITerminal.print_string [ ANSITerminal.blue ]
