@@ -325,6 +325,8 @@ let other_functions =
       assert_equal true (State.check_hand [ 0; 1; 2; 3; 4 ] 0) );
     ( "Card is middle card in hand" >:: fun _ ->
       assert_equal true (State.check_hand [ 1; 2; 0; 1 ] 0) );
+    ( "Card is middle card in hand" >:: fun _ ->
+      assert_equal true (State.check_hand [ 1; 0; 2; 4; 6 ] 0) );
     ( "Card is last card in hand" >:: fun _ ->
       assert_equal true (State.check_hand [ 0; 1; 2; 3; 4 ] 4) );
     ( "Not in hand" >:: fun _ ->
@@ -342,6 +344,10 @@ let other_functions =
     ( "Add two card to player's hand not sorted order" >:: fun _ ->
       assert_equal [ 0; 1 ]
         (print_hand (State.add_card (State.add_card player0 1) 0)) );
+    ( "Add three card to player's hand not sorted order" >:: fun _ ->
+      assert_equal [ 0; 1; 3 ]
+        (print_hand
+           (State.add_card (State.add_card (State.add_card player0 1) 0) 3)) );
     ( "Remove 0 cards from full deck" >:: fun _ ->
       assert_equal 52
         (List.length (State.remove_card_top 0 full_game |> State.get_deck)) );
@@ -388,6 +394,8 @@ let command_tests =
       assert_equal Command.Quit (Command.parse "QUiT") );
     ( "Testing extra spaces in quit" >:: fun _ ->
       assert_equal Command.Quit (Command.parse " Quit  ") );
+    ( "Testing extra spaces in quit" >:: fun _ ->
+      assert_equal Command.Quit (Command.parse " QuIt  ") );
     ( "Testing bad quit input" >:: fun _ ->
       assert_raises Command.Unrecognized (fun () -> Command.parse "qu it") );
     ( "Testing normal request input" >:: fun _ ->
@@ -408,6 +416,10 @@ let command_tests =
     ( "Drawing multiple cards at once" >:: fun _ ->
       assert_equal [ 1; 1; 1 ] (State.repeat_add_card player0 1 3 |> print_hand)
     );
+    ( "Drawing no cards at once" >:: fun _ ->
+      assert_equal [] (State.repeat_add_card player0 1 0 |> print_hand) );
+    ( "Drawing one card at once" >:: fun _ ->
+      assert_equal [ 1 ] (State.repeat_add_card player0 1 1 |> print_hand) );
     ( "Drawing 0 doesn't change hand" >:: fun _ ->
       assert_equal [] (State.repeat_add_card player0 1 0 |> print_hand) );
     ( "Count cards where one card is in hand" >:: fun _ ->
@@ -439,6 +451,10 @@ let command_tests =
       assert_equal [ 1; 1; 1; 1; 1 ]
         (State.repeat_add_card (State.repeat_add_card player0 3 2) 1 5
         |> State.delete_cards 3 |> print_hand) );
+    ( "deleting a single card from hand" >:: fun _ ->
+      assert_equal [ 3; 3 ]
+        (State.repeat_add_card (State.repeat_add_card player0 3 2) 1 1
+        |> State.delete_cards 1 |> print_hand) );
     ( "deleting non-existent cards in hand" >:: fun _ ->
       assert_equal [ 2 ]
         (State.repeat_add_card player0 2 1 |> State.delete_cards 5 |> print_hand)
