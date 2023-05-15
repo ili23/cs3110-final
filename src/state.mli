@@ -56,6 +56,8 @@ val has_card : int -> player -> bool
 (** [has_card card player] returns if the player has a card of type card. *)
 
 val remove_card_top : int -> state -> state
+(** [remove_card_top num st] returns a new game state with num cards removed
+    from the deck from the game state st.*)
 
 val draw_from_pile : state -> player -> player
 (** [remove_top_card deck] removes the top card of a non-empty deck. If the deck
@@ -121,6 +123,7 @@ val add_quad : player -> player
 
 val get_score : player -> int
 (** [get_score pl] returns the score of player pl. *)
+
 val get_won_cards : player -> int list
 (** [get_won_cards pl] returns the won_cards of player pl. *)
 
@@ -131,13 +134,28 @@ val check_top_card : state -> int
 (** [check_top_card st] returns the top card in the deck of st. *)
 
 val get_log : state -> string list
+(** [get_log st] returns the log of events for the current game state st.*)
+
 val add_log : state -> string -> state
+(** [add_log st message] returns a game state st with message added to its logs. *)
 
 val check_winner : state -> string list
+(** [check_winner st] returns the winner(s) of the game*)
+
 val set_score : player -> int -> player
+(** [set_score pl score sets the score of player pl]*)
 
 exception NoPlayer
+(** Raised when no player is found.*)
+
 exception NoCardsLeft
+(** Raised when no cards are left in the deck.*)
+
 exception Illegal
+(** Raised as an illegal state for impossible pattern match case is reached .*)
+
 exception Temporary
+(** Raised as a temp for impossible pattern match cases.*)
+
 exception Impossible
+(** Raised as a placeholder for impossible pattern match cases.*)
