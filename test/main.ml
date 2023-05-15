@@ -528,12 +528,15 @@ let command_tests =
       assert_equal
         (Command.Request ("joe", 51))
         (Command.parse "   request    joe 51") );
-    ( "Testing normal request input extra spaces" >:: fun _ ->
+    ( "Testing normal request input extra spaces after params" >:: fun _ ->
       assert_equal
         (Command.Request ("joe", 51))
-        (Command.parse "   request    joe 51") );
+        (Command.parse "request joe     51   ") );
     ( "Testing empty" >:: fun _ ->
       assert_raises Command.Empty (fun () -> Command.parse "") );
+    ( "Testing request and quit in same string" >:: fun _ ->
+      assert_raises Command.Unrecognized (fun () ->
+          Command.parse "request quit") );
     ( "Testing request with no other inputs" >:: fun _ ->
       assert_raises Command.Unrecognized (fun () -> Command.parse "request") );
     ( "Testing unrecognized" >:: fun _ ->
