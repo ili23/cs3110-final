@@ -35,8 +35,8 @@ let gen_rand_int bound =
   Random.int bound
 
 let shuffle =
-  let d = Array.make 13 1 in
-  for x = 1 to 6 do
+  let d = Array.make 52 1 in
+  for x = 1 to 13 do
     for y = 0 to 3 do
       Array.set d ((4 * (x - 1)) + y) x
     done
