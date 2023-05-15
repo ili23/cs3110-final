@@ -1,8 +1,6 @@
-(** Representation of a game state
-
-    This module represents the state of a game of Go-Fish including player
-    details (such as their name, their hand, and the cards they won already),
-    the current turn's player, and the game deck. *)
+(** Representation of a game state. This module represents the state of a game
+    of Go-Fish including player details (such as their name, their hand, and the
+    cards they won already), the current turn's player, and the game deck. *)
 
 type player
 (** The abstract type of values representing a player. *)
