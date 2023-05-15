@@ -35,15 +35,15 @@ let gen_rand_int bound =
   Random.int bound
 
 let shuffle =
-  let d = Array.make 52 1 in
-  for x = 1 to 13 do
+  let d = Array.make 24 1 in
+  for x = 1 to 6 do
     for y = 0 to 3 do
       Array.set d ((4 * (x - 1)) + y) x
     done
   done;
   for x = 0 to 100 do
-    let x_1 = gen_rand_int 52 in
-    let x_2 = gen_rand_int 52 in
+    let x_1 = gen_rand_int 24 in
+    let x_2 = gen_rand_int 24 in
     let x_1_value = Array.get d x_1 in
     let x_2_value = Array.get d x_2 in
     Array.set d x_2 x_1_value;
