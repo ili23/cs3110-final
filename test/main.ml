@@ -195,6 +195,17 @@ let score_game_3 =
   let temp2 = State.update_player temp1 player2 player2_scored3 in
   State.update_player temp2 player3 player3_scored3
 
+let player0_scored4 = State.set_score player0 4
+let player1_scored4 = State.set_score player1 4
+let player2_scored4 = State.set_score player2 4
+let player3_scored4 = State.set_score player3 4
+
+let score_game_4 =
+  let temp = State.update_player full_game player0 player0_scored4 in
+  let temp1 = State.update_player temp player1 player1_scored4 in
+  let temp2 = State.update_player temp1 player2 player2_scored4 in
+  State.update_player temp2 player3 player3_scored4
+
 (****************************************************************************
   Testing state.ml functions continued
   ***************************************************************************)
@@ -267,7 +278,7 @@ let game_tests =
         (pp_player
            (State.assign_id full_game 0
            |> State.next_turn 4 |> State.get_current_player)) );
-    ( "Get winner when all players have same scores" >:: fun _ ->
+    ( "Get winner at beginning of game" >:: fun _ ->
       assert_equal
         [ "Dragon"; "Goblin"; "Musketeer"; "Hog Rider" ]
         (State.check_winner full_game) );
@@ -279,6 +290,10 @@ let game_tests =
       assert_equal
         [ "Dragon"; "Goblin"; "Musketeer" ]
         (State.check_winner score_game_3) );
+    ( "Get winner all tied" >:: fun _ ->
+      assert_equal
+        [ "Dragon"; "Goblin"; "Musketeer"; "Hog Rider" ]
+        (State.check_winner score_game_4) );
     ("No actions in log" >:: fun _ -> assert_equal [] (State.get_log full_game));
     ( "Add one action to log" >:: fun _ ->
       assert_equal [ "Test" ] (State.add_log full_game "Test" |> State.get_log)

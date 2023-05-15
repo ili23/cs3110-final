@@ -406,9 +406,9 @@ let rec play_game input =
 
 (** [main ()] prompts for the game to play, then starts it. *)
 let main () =
-  print_string scrollTerminal;
+  print_string "\n\n\n";
   ANSITerminal.print_string [ ANSITerminal.blue ]
-    "\n\nWelcome to Big Bactrian's Camel's Implementation of Go Fish.\n";
+    "Welcome to Big Bactrian's Camel's Implementation of Go Fish.\n";
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "\n\
      Here are some rules/tips to ensure the best experience: \n\n\
