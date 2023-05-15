@@ -97,9 +97,30 @@ let rec name_check (name : string) player_list =
 
 let plural count = if count > 1 then "s" else ""
 
+let vowel card =
+  match card with
+  | 7 -> "an"
+  | 11 -> "an"
+  | _ -> "a"
+
+let rec print_log list num =
+  match list with
+  | [] -> print_endline ""
+  | h :: t ->
+      if num > 0 then (
+        print_string scrollTerminal;
+        print_endline "Log: ";
+        print_endline (h ^ "\n");
+        print_log t (num - 1))
+      else (
+        print_endline "Log: ";
+        print_endline h)
+
 let rec shift state num input =
   match input with
-  | i when String.lowercase_ascii i = "ready" -> state
+  | i when String.lowercase_ascii i = "ready" ->
+      let _ = print_log (List.rev (State.get_log state)) 10 in
+      state
   | i when String.lowercase_ascii i = "quit" ->
       print_endline "Farewell Go Fish-ers ";
       exit 0
@@ -117,31 +138,51 @@ let one_turn state name card num =
   let current_player = State.get_current_player state in
   let sender = State.find_player name players in
   if State.has_card card sender then (
-    let new_state = State.exchange_cards current_player sender card state in
     let count = State.count_cards card sender in
+    let new_state = State.exchange_cards current_player sender card state in
     print_endline
       (string_of_int count ^ " " ^ string_of_int card ^ plural count
      ^ " received from " ^ name);
-    let curr_player = State.get_current_player new_state in
+    let logged_state =
+      State.add_log new_state
+        (State.get_player_name current_player
+        ^ " received " ^ string_of_int count ^ " " ^ string_of_int card
+        ^ plural count ^ " from " ^ name)
+    in
+    let curr_player = State.get_current_player logged_state in
     if List.length (State.check_quad curr_player) > 0 then (
       let newest_state =
-        State.update_player new_state curr_player (State.add_quad curr_player)
+        State.update_player logged_state curr_player
+          (State.add_quad curr_player)
       in
       print_endline ("Congrats you collected all 4 " ^ string_of_int card ^ "s");
       print_endline
         ("Your new score is: "
         ^ string_of_int
             (State.get_score (State.get_current_player newest_state)));
-      newest_state)
-    else new_state)
+      let log_state =
+        State.add_log newest_state
+          (State.get_player_name current_player
+          ^ " collected all 4 " ^ string_of_int card ^ "s")
+      in
+      log_state)
+    else logged_state)
   else (
     print_endline "You guessed incorrectly! Go Fish!";
-    let new_draw_player = State.draw_from_pile state current_player in
+    let logged_state =
+      State.add_log state
+        (State.get_player_name current_player
+        ^ " unsuccessfully requested for " ^ vowel card ^ " "
+        ^ string_of_int card ^ " from " ^ name)
+    in
+    let new_draw_player = State.draw_from_pile logged_state current_player in
     print_endline
-      ("You drew a "
+      ("You drew "
+      ^ vowel (State.check_top_card state)
+      ^ " "
       ^ string_of_int (State.check_top_card state)
       ^ " from the deck!");
-    let new_deck_state = State.remove_card_top 1 state in
+    let new_deck_state = State.remove_card_top 1 logged_state in
     let new_state =
       State.update_player new_deck_state current_player new_draw_player
     in
@@ -156,9 +197,8 @@ let one_turn state name card num =
 
 let rec game_cycle (state : State.state) num =
   if State.check_deck state then
-    let _ = print_endline "\n \n \n" in
     let _ = print_hand [ State.get_current_player state ] in
-    let _ = print_endline "\n \n \n" in
+    let _ = print_endline "\n" in
     try
       match parse_command state with
       | Command.Request (name, card) ->

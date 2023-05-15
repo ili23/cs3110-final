@@ -14,6 +14,7 @@ type state = {
   deck : int list;
   players : player list;
   current_player : int;
+  log : string list;
 }
 
 (****************************************************************************
@@ -55,7 +56,7 @@ let shuffle =
 let init_player name =
   { name; ready = false; id = -1; hand = []; score = 0; won_cards = [] }
 
-let init_state = { deck = shuffle; players = []; current_player = 0 }
+let init_state = { deck = shuffle; players = []; current_player = 0; log = [] }
 
 let add_player player game_state =
   { game_state with players = game_state.players @ [ player ] }
@@ -90,6 +91,7 @@ let get_player_name player = player.name
 let get_score player = player.score
 let get_won_cards player = player.won_cards
 let get_hand player = player.hand
+let get_log state = state.log
 
 (****************************************************************************
   Other functions related to states.
@@ -109,6 +111,10 @@ let check_deck state =
 
 let add_card player card =
   { player with hand = List.sort compare (card :: player.hand) }
+
+let add_log state string =
+  let old_log = state.log in
+  { state with log = old_log @ [ string ] }
 
 (** Used to remove num top cards in deck.*)
 let remove_card_top num state =
