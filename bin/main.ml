@@ -95,7 +95,8 @@ let parse_command state =
   with Command.Unrecognized | Command.Empty ->
     ANSITerminal.print_string [ ANSITerminal.blue ]
       "Invalid request given. Enter another request. Remember the format is \
-       'Request <player name> <card>' \n";
+       'Request <player name> <card>'. Make sure that card is either an \
+       integer from 2-10 or 'A','J','Q', or 'K'. \n";
     raise Command.Unrecognized
 
 let rec name_check (name : string) player_list =
@@ -381,7 +382,9 @@ let start_game num =
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "As a reminder, here are some commands for you to use during the game: \n";
   ANSITerminal.print_string [ ANSITerminal.blue ]
-    "Type card requests in the format 'Request <player name> <card>' \n ";
+    "Type card requests in the format 'Request <player name> <card>' Make sure \
+     that card is either an integer from 2-10 or 'A','J','Q', or 'K'. \n\
+    \ ";
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "Type 'quit' to quit the game \n";
   ANSITerminal.print_string [ ANSITerminal.blue ]
@@ -393,10 +396,6 @@ let start_game num =
   print_string ">> ";
   let input = read_line () in
   move_next state num input
-
-(** printHand (State.get_player_list (deal_cards (initial_state num) num));
-    print_endline "Request cards from a player by typing 'Request <player name>
-    <card>'"; print_endline "Fire, let's get started!"*)
 
 let rec play_game input =
   match input with
@@ -415,9 +414,9 @@ let rec play_game input =
 
 (** [main ()] prompts for the game to play, then starts it. *)
 let main () =
-  print_string scrollTerminal;
+  print_string "\n\n\n";
   ANSITerminal.print_string [ ANSITerminal.blue ]
-    "\n\nWelcome to Big Bactrian's Camel's Implementation of Go Fish.\n";
+    "Welcome to Big Bactrian's Camel's Implementation of Go Fish.\n";
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "\n\
      Here are some rules/tips to ensure the best experience: \n\n\
@@ -438,10 +437,11 @@ let main () =
      is will be asked to type in ready to make sure they are ready and are the \
      only ones seeing their card. \n\n\
      During a turn, a player can request a card from another player by typing \
-     in 'Request <player name> <card>' or quit the game by typing in 'Quit'. \
-     Players can only request for cards they already have in their hand. If \
-     the player successfully requests a card from another player, the cards \
-     are given to the current player, and the player can request again. \
+     in 'Request <player name> <card>' (Make sure that card is either an \
+     integer from 2-10 or 'A','J','Q', or 'K'.) or quit the game by typing in \
+     'Quit'. Players can only request for cards they already have in their \
+     hand. If the player successfully requests a card from another player, the \
+     cards are given to the current player, and the player can request again. \
      Otherwise, the current player will 'Go Fish' and draws a card from the \
      deck. \n\n\
      If a player gets 4 of a kind (i.e. 4 of the same value), then they get 1 \
