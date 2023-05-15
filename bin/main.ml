@@ -5,7 +5,7 @@ let rec concat_newlines x acc =
   | 0 -> acc
   | x -> concat_newlines (x - 1) "\n" ^ acc
 
-let scrollTerminal = print_string (concat_newlines 23 "")
+let scrollTerminal = concat_newlines 23 ""
 let remove_empty x = String.length x > 0
 
 let rec int_list_to_string lst =
@@ -96,6 +96,7 @@ let one_turn state name card num =
     let new_state = State.update_player state current_player new_draw_player in
     let newest = State.next_turn num new_state in
     print_endline "drawn from pile";
+    print_string scrollTerminal;
     newest)
 
 let rec game_cycle (state : State.state) num =
@@ -116,33 +117,58 @@ let rec game_cycle (state : State.state) num =
               let new_state = one_turn state name card num in
               game_cycle new_state num
             else (
-              print_endline "Invalid name. Enter another command";
+              print_endline
+                "Invalid name. Make sure to check your spelling and the \
+                 request format.";
               game_cycle state num)
           else (
             print_endline
-              "You can only request cards you have. Enter another command";
+              "You can only request cards you have. Make sure to double check \
+               your input and the request format.";
             game_cycle state num)
       | Command.Quit ->
-          print_endline "Farewell Go Fish-ers";
+          print_endline
+            "Thank you for playing the game, hope you had fun, Farewell Go \
+             Fish-ers!";
           exit 0
     with Command.Unrecognized -> game_cycle state num
   else (
     print_endline "No more cards left in the deck. The game is over";
     exit 0)
 
+let rec move_next state num input =
+  match input with
+  | i when String.lowercase_ascii i = "ready" -> game_cycle state num
+  | i when String.lowercase_ascii i = "quit" ->
+      print_endline "Farewell Go Fish-ers ";
+      exit 0
+  | i ->
+      print_endline
+        "Not recognized, if you are ready to see your cards, enter 'ready' \
+         without spaces or extra characters or if you want to quit, enter \
+         'quit' \n";
+      print_string ">> ";
+      let new_input = read_line () in
+      move_next state num new_input
+
 let start_game num =
-  let clearTerminal : unit = print_endline "\n" in
   let state = ready_state num in
-  print_string "Ready to begin?";
+  print_string scrollTerminal;
+  print_string "Here we go! The players will go in this order: ";
   print_players (State.get_player_list state);
-  print_endline "\n";
-  print_endline "Here are some commands for you to use before you begin:";
+  print_endline ".\n";
+  print_endline
+    "As a reminder, here are some commands for you to use during the game:";
   print_endline
     "Type card requests in the format 'Request <player name> <card>'";
   print_endline "Type 'quit' to quit the game";
   print_endline "Fire, let's get started!";
-  clearTerminal;
-  game_cycle state num
+  print_endline
+    "Are you ready to see your cards? Make sure that the other players can't \
+     see your cards. If you are ready, type 'ready'. As per usual, type 'quit' \
+     to leave the game. ";
+  let input = read_line () in
+  move_next state num input
 
 (** printHand (State.get_player_list (deal_cards (initial_state num) num));
     print_endline "Request cards from a player by typing 'Request <player name>
@@ -164,7 +190,7 @@ let rec play_game input =
 
 (** [main ()] prompts for the game to play, then starts it. *)
 let main () =
-  scrollTerminal;
+  print_string scrollTerminal;
   ANSITerminal.print_string [ ANSITerminal.blue ]
     "\n\nWelcome to Big Bactrian's Camel's Implementation of Go Fish.\n";
   ANSITerminal.print_string [ ANSITerminal.blue ]
@@ -188,8 +214,6 @@ let main () =
   match read_line () with
   | x -> play_game x
   | exception End_of_file -> ()
-
-(*number -> *)
 
 (*Need to add a check here to make sure that the input is an int*)
 (* Execute the game engine. *)
