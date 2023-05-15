@@ -44,7 +44,10 @@ let deal_cards state num =
   State.update_players state
     (State.initialize_players_hands State.shuffle (State.get_player_list state))
 
-let ready_state num = State.assign_id (deal_cards (initial_state num) num) num
+let remove_card state num = State.remove_card_top (num * 5) state
+
+let ready_state num =
+  State.assign_id (remove_card (deal_cards (initial_state num) num) num) num
 
 let rec cards_to_string hand =
   match hand with
@@ -71,6 +74,14 @@ let rec print_hand p_list =
       print_endline
         ("Your hand is: " ^ cards_to_string (State.get_player_hand h));
       print_hand t
+
+let rec print_deck deck =
+  match deck with
+  | [] -> ()
+  | h :: t ->
+      print_string (string_of_int h);
+      print_string " ";
+      print_deck t
 
 let rec print_players p_list =
   match p_list with
@@ -108,18 +119,20 @@ let rec print_log list num =
   | [] -> print_endline ""
   | h :: t ->
       if num > 0 then (
-        print_string scrollTerminal;
-        print_endline "Log: ";
         print_endline (h ^ "\n");
         print_log t (num - 1))
-      else (
-        print_endline "Log: ";
-        print_endline h)
+      else print_endline h
+
+let full_print_log list num =
+  print_string scrollTerminal;
+  print_endline "Log: ";
+  print_log list num
 
 let rec shift_ready state num input =
   match input with
   | i when String.lowercase_ascii i = "ready" ->
       let _ = print_log (List.rev (State.get_log state)) 10 in
+      let _ = print_deck (State.get_deck state) in
       state
   | i when String.lowercase_ascii i = "quit" ->
       print_endline "Farewell Go Fish-ers ";
