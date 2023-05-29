@@ -2,5 +2,10 @@ The only requirements to play our implementation of Go Fish is to have OCaml ins
 Please follow the instructions at this link, https://cs3110.github.io/textbook/chapters/preface/install.html,
 to install OCaml if it is not already on your computer. 
 
+After installing OCaml and initializing an OPAM switch, run the following commands:
+opam update
+opam upgrade
+opam install ANSITerminal
+
 Open up a terminal from our project, change working directory to this project 
 and run [make play] to start the game. Make sure to read and follow the prompts. 
